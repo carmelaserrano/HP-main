@@ -1,0 +1,536 @@
+/* Hero Section */
+.hero-section {
+  position: relative;
+  height: 100vh;
+
+  /* para que el contenido pueda verse sin cortarse pongo visible*/
+  overflow: visible;
+  padding-top: 130px; /* Espacio para top bar (50px) + navbar (80px) */
+}
+
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-video::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 80px;
+  z-index: 2;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Texto Hero - Izquierda */
+.hero-text {
+  flex: 1;
+  max-width: 600px;
+  color: white;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: white;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: rgba(255,255,255,0.95);
+  line-height: 1.6;
+}
+
+.btn-discover {
+  background: transparent;
+  border: 2px solid #dfa974;
+  color: #b7a18a;
+  padding: 14px 35px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-discover:hover {
+  background: #dfa974;
+  color: white;
+}
+
+/* Panel de Reservas - Derecha */
+.booking-panel {
+  background: white;
+  padding: 40px 35px;
+  border-radius: 4px;
+  width: 380px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.booking-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #19191a;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #707079;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e5e5e5;
+  background: #f9f9f9;
+  font-size: 0.9rem;
+  color: #19191a;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #dfa974;
+  background: white;
+}
+
+.btn-check-availability {
+  width: 100%;
+  background: #dfa974;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-check-availability:hover {
+  background: #c28f5d;
+}
+
+/* About Section */
+.about-section {
+  padding: 100px 80px;
+  background: #f9f9f9;
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.section-label {
+  color: #dfa974;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.about-text h2 {
+  font-size: 2.5rem;
+  margin: 15px 0 25px;
+  color: #19191a;
+}
+
+.about-text p {
+  color: #707079;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.btn-read-more {
+  background: #dfa974;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-read-more:hover {
+  background: #c28f5d;
+}
+
+.about-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.about-images img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Services Section */
+.services-section {
+  padding: 100px 80px;
+  text-align: center;
+  background: white;
+}
+
+.services-section h2 {
+  font-size: 2.5rem;
+  margin: 15px 0 60px;
+  color: #19191a;
+}
+
+.services-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.service-card {
+  padding: 40px 30px;
+  border: 1px solid #e5e5e5;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.service-icon {
+  font-size: 3rem;
+  color: #dfa974;
+  margin-bottom: 20px;
+}
+
+.service-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #19191a;
+}
+
+.service-card p {
+  color: #707079;
+  line-height: 1.6;
+}
+
+/* Rooms Preview */
+.rooms-preview {
+  padding: 100px 80px;
+  background: #f9f9f9;
+}
+
+.rooms-header-section {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.rooms-header-section h2 {
+  font-size: 2.8rem;
+  color: #19191a;
+  margin: 15px 0 20px;
+  font-weight: 700;
+}
+
+.rooms-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.rooms-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.room-card {
+  background: white;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.room-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Room Image Container with Hover Effect */
+.room-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.room-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.room-card:hover img {
+  transform: scale(1.1);
+}
+
+/* Hover Overlay */
+.room-hover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  padding: 30px;
+}
+
+.room-image-container:hover .room-hover-overlay {
+  opacity: 1;
+}
+
+/* Amenities List in Hover */
+.room-amenities-hover {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 25px 0;
+  color: white;
+}
+
+.room-amenities-hover li {
+  padding: 8px 0;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideInLeft 0.5s ease forwards;
+  opacity: 0;
+}
+
+.room-image-container:hover .room-amenities-hover li:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.room-image-container:hover .room-amenities-hover li:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.room-image-container:hover .room-amenities-hover li:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.room-image-container:hover .room-amenities-hover li:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.room-amenities-hover i {
+  color: #c9a961;
+  font-size: 18px;
+}
+
+/* View Room Button */
+.btn-view-room {
+  background-color: #c9a961;
+  color: white;
+  border: none;
+  padding: 12px 35px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-view-room:hover {
+  background-color: #b89850;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(201, 169, 97, 0.4);
+}
+
+.room-info {
+  padding: 30px;
+  background: linear-gradient(to bottom, white 0%, #fafafa 100%);
+}
+
+.room-category {
+  display: inline-block;
+  background: linear-gradient(135deg, #c9a961 0%, #b89850 100%);
+  color: white;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.room-info h3 {
+  font-size: 1.4rem;
+  margin: 10px 0;
+  color: #19191a;
+  font-weight: 700;
+}
+
+.room-description {
+  font-size: 14px;
+  color: #666;
+  margin: 12px 0 18px 0;
+  line-height: 1.6;
+  min-height: 40px;
+}
+
+.room-price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #c9a961;
+  margin-top: 15px;
+}
+
+.room-price span {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #999;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+  padding: 100px 80px;
+  text-align: center;
+  background: white;
+}
+
+.testimonials-section h2 {
+  font-size: 2.5rem;
+  margin: 15px 0 60px;
+  color: #19191a;
+}
+
+.testimonial-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.testimonial-text {
+  font-size: 1.2rem;
+  color: #19191a;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.testimonial-rating {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.testimonial-author {
+  color: #707079;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.tripadvisor-logo {
+  width: 120px;
+  height: auto;
+  margin-top: 20px;
+}
+
+/* Carousel Controls */
+.carousel-control-prev,
+.carousel-control-next {
+  width: 50px;
+  height: 50px;
+  background: rgba(223, 169, 116, 0.8);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  background: rgba(223, 169, 116, 1);
+}
+
+.carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #dfa974;
+}
+
+/* Responsive */
+
+/* Desktop Grande (1400px+) - Ya está definido arriba */
+
+/* Desktop Mediano: 1200px - 1400px */
+@media (max-width: 768px) {
+  .hero-content {
+    padding: 120px 60px;
+  }
+  .booking-panel{
+    width: 100%;
+    max-width: 400px;
+    
+  }
+}

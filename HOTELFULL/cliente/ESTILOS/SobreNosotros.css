@@ -1,0 +1,477 @@
+/* Sobre Nosotros Page */
+.sobre-nosotros-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Hero Header */
+.sobre-hero-header {
+  position: relative;
+  height: 70vh;
+  background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1920&h=1080&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 80px;
+}
+
+.sobre-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+.sobre-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  padding: 0 20px;
+  animation: fadeInUp 1s ease-out;
+}
+
+.sobre-hero-content h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.sobre-hero-subtitle {
+  font-size: 1.3rem;
+  line-height: 1.8;
+  font-weight: 300;
+  opacity: 0.95;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section Label */
+.section-label-sobre {
+  display: inline-block;
+  color: #c9a961;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+/* Historia Section */
+.sobre-historia-section {
+  padding: 100px 80px;
+  background: white;
+}
+
+.sobre-historia-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.sobre-historia-text h2 {
+  font-size: 2.8rem;
+  color: #19191a;
+  margin: 15px 0 40px;
+  font-weight: 700;
+}
+
+/* Timeline */
+.timeline-content {
+  position: relative;
+  padding-left: 40px;
+}
+
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 20px;
+  bottom: 20px;
+  width: 3px;
+  background: linear-gradient(to bottom, #c9a961, #dfa974);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 35px;
+  padding-left: 30px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -26px;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 3px solid #c9a961;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c9a961;
+  font-size: 14px;
+  z-index: 1;
+}
+
+.timeline-item p {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #555;
+  margin: 0;
+}
+
+.sobre-historia-image {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.sobre-historia-image img {
+  width: 100%;
+  height: 600px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.sobre-historia-image:hover img {
+  transform: scale(1.05);
+}
+
+/* Statistics Section */
+.sobre-stats-section {
+  padding: 80px 80px;
+  background: linear-gradient(135deg, #c9a961 0%, #b89850 100%);
+  color: white;
+}
+
+.stats-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 50px;
+  text-align: center;
+}
+
+.stat-item {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.stat-icon {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+.stat-number {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Why Choose Us Section */
+.sobre-why-section {
+  padding: 100px 80px;
+  background: #f9f9f9;
+  text-align: center;
+}
+
+.sobre-why-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sobre-why-content h2 {
+  font-size: 2.8rem;
+  color: #19191a;
+  margin: 15px 0 60px;
+  font-weight: 700;
+}
+
+.reasons-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  margin-bottom: 50px;
+}
+
+.reason-item {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.reason-item:hover {
+  transform: translateX(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.reason-icon {
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #c9a961, #dfa974);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.reason-item:hover .reason-icon {
+  transform: rotate(360deg);
+}
+
+
+.reason-text h3 {
+  font-size: 1.2rem;
+  color: #19191a;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.reason-line {
+  width: 60px;
+  height: 3px;
+  background: #c9a961;
+  border-radius: 2px;
+}
+
+.sobre-closing {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.8;
+  font-style: italic;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Gallery Section */
+.sobre-gallery-section {
+  padding: 100px 80px;
+  background: white;
+  text-align: center;
+}
+
+.sobre-gallery-section h2 {
+  font-size: 2.8rem;
+  color: #19191a;
+  margin: 15px 0 60px;
+  font-weight: 700;
+}
+
+.gallery-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  height: 280px;
+  cursor: pointer;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.gallery-overlay i {
+  font-size: 3rem;
+  color: white;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.2);
+}
+
+.gallery-item:hover .gallery-overlay {
+  opacity: 1;
+}
+
+/* CTA Section */
+.sobre-cta-section {
+  padding: 100px 80px;
+  background: linear-gradient(135deg, rgba(201, 169, 97, 0.95), rgba(184, 152, 80, 0.95)),
+              url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920') center/cover;
+  background-attachment: fixed;
+  text-align: center;
+  color: white;
+}
+
+.cta-content h2 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.cta-content p {
+  font-size: 1.3rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.btn-cta-primary,
+.btn-cta-secondary {
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid white;
+}
+
+.btn-cta-primary {
+  background: white;
+  color: #c9a961;
+  border-color: white;
+}
+
+.btn-cta-primary:hover {
+  background: transparent;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cta-secondary {
+  background: transparent;
+  color: white;
+  border-color: white;
+}
+
+.btn-cta-secondary:hover {
+  background: white;
+  color: #c9a961;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .sobre-hero-content h1 {
+    font-size: 3rem;
+  }
+
+  .sobre-historia-content {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reasons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sobre-hero-header {
+    height: 60vh;
+  }
+
+  .sobre-hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .sobre-hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .sobre-historia-section,
+  .sobre-stats-section,
+  .sobre-why-section,
+  .sobre-gallery-section,
+  .sobre-cta-section {
+    padding: 60px 30px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-cta-primary,
+  .btn-cta-secondary {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+}

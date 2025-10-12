@@ -1,0 +1,47 @@
+  /* Navbar elegante */
+  .navbar {
+    background: rgba(52, 58, 64, 0.95) !important;    
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid
+  rgba(255,255,255,0.1);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+  }
+
+  .navbar-brand {
+    color: white !important;
+    font-weight: bold;
+  }
+
+  .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    transition: all 0.3s ease;
+    padding: 8px 15px !important;
+    border-radius: 5px;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: #f8d7da !important;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .dropdown-menu {
+    background: rgba(52, 58, 64, 0.95) !important;    
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .dropdown-item {
+    color: rgba(255,255,255,0.9) !important;
+    transition: all 0.3s ease;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(255,255,255,0.1) !important;     
+    color: white !important;
+  }
+
+  .container {
+    max-width: 1400px;
+  }
