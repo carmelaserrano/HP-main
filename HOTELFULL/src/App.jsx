@@ -10,10 +10,12 @@ import SobreNosotros from '../cliente/PAGINAS/SobreNosotros'
 import Contacto from '../cliente/PAGINAS/Contacto'
 import Actividades from '../cliente/PAGINAS/Actividades'
 import Servicios from '../cliente/PAGINAS/Servicios'
+import ScrollToTop from '../cliente/COMPONENTES/ScrollToTop'
 
 function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop />
       <div>
         <Navbar />
 

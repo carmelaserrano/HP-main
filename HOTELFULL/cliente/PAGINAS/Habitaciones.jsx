@@ -28,15 +28,13 @@ function Habitaciones() {
             features={[
               { icon: 'fa-water', text: t('habitaciones.panoramicView') },
               { icon: 'fa-bed', text: t('habitaciones.kingBed') },
-              { icon: 'fa-door-open', text: t('habitaciones.privateVeranda') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
               { icon: 'fa-tv', text: t('habitaciones.smartTv') },
               { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
-              { icon: 'fa-bath', text: t('habitaciones.luxuryBath') },
-              { icon: 'fa-concierge-bell', text: t('habitaciones.roomService') },
+              { icon: 'fa-bath', text: t('habitaciones.bath') },
+              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
             ]}
-            details={{ guests: `2 ${t('habitaciones.guests')}`, size: '42 m²' }}
-            price="$280"
+            details={{ guests: `2/3 ${t('habitaciones.guests')}`, size: '60 m²' }}
+            price="$250"
             period={t('habitaciones.perNight')}
           />
           {/* habitación2 */}
@@ -50,19 +48,18 @@ function Habitaciones() {
               
             ]}
             title="Family Suite"
-            description="La opción Family cuenta con una recámara con cama king-size con TV y una recámara doble, una cocina gourmet bien equipada, un espacio adjunto con comedor formal, una sala de estar cómoda y una TV, dos baños, y una terraza privada."
-            badge="Jacuzzi"
+            description="La opción Family cuenta con dos recámara, una con cama king-size con TV y una doble. A demás, una cocina gourmet bien equipada, un espacio adjunto con comedor formal, una sala de estar cómoda con TV y dos baños."
+            badge="Apartment"
             features={[
               { icon: 'fa-users', text: '2 habitaciones' },
-              { icon: 'fa-kitchen-set', text: 'Kitchenette equipada' },
-              { icon: 'fa-tv', text: 'Smart TV' },
-              { icon: 'fa-bed', text: t('habitaciones.kingBed') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
+              { icon: 'fa-blender', text: 'Kitchenette equipada' },
+              { icon: 'fa-tv', text: '2 TVs' },
               { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
               { icon: 'fa-bath', text: t('habitaciones.luxuryBath') },
+              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
             ]}
-            details={{ guests: '2 adultos y 2 niños', size: '42 m²' }}
-            price="$310"
+            details={{ guests: '2 adultos y 2 niños', size: '100 m²' }}
+            price="$410"
             period={t('habitaciones.perNight')}
           />
 
@@ -72,16 +69,17 @@ function Habitaciones() {
               '/recursos/IMAGENES/habitaciones/3dormitorio/d3a.jpeg',
               '/recursos/IMAGENES/habitaciones/3dormitorio/d3b.jpeg',
             ]}
-            title="Suite Romántica"
-            description="Perfecta para parejas, con jacuzzi, iluminación tenue y servicio de bienvenida."
+            title="Moon Suite"
+            description="La opción perfecta para parejas, incluida con jacuzzi, iluminación tenue y servicio de bienvenida."
             badge="Honeymoon"
             features={[
               { icon: 'fa-heart', text: 'Decoración romántica' },
               { icon: 'fa-bath', text: 'Jacuzzi con pétalos' },
               { icon: 'fa-wifi', text: 'Wi-Fi gratuito' },
+              { icon: 'fa-concierge-bell', text: t('habitaciones.roomService') },
             ]}
-            details={{ guests: '2 adultos', size: '55 m²' }}
-            price="$450"
+            details={{ guests: '2 adultos', size: '45 m²' }}
+            price="$190"
             period={t('habitaciones.perNight')}
           />
           
@@ -92,18 +90,19 @@ function Habitaciones() {
               '/recursos/IMAGENES/habitaciones/4dormitorio/d4b.jpeg',
               '/recursos/IMAGENES/habitaciones/4dormitorio/d4c.jpeg',
             ]}
-            title="Suite Jardín Moderno"
-            description="Una suite contemporánea rodeada de vegetación, con detalles en mármol negro, jardín privado y una piscina rodeada de plantas que ofrece un ambiente natural y elegante."
-            badge="Premium"
+            title="Green Suite"
+            description="Una opción premium, rodeada de vegetación, con detalles en mármol negro, jardín privado y una piscina rodeada de plantas que ofrece un ambiente natural y elegante."
+            badge="Pool"
             features={[
               { icon: 'fa-seedling', text: 'Jardín privado con vegetación natural' },
               { icon: 'fa-swimmer', text: 'Pileta privada con deck de madera' },
               { icon: 'fa-gem', text: 'Decoración en mármol negro' },
-              { icon: 'fa-wifi', text: 'Wi-Fi de alta velocidad' },
+              { icon: 'fa-bath', text: t('habitaciones.bath') },
               { icon: 'fa-coffee', text: 'Cafetera y amenities de lujo' },
+              { icon: 'fa-wifi', text: 'Wi-Fi de alta velocidad' },
             ]}
-            details={{ guests: '2 personas', size: '85 m²' }}
-            price="$720"
+            details={{ guests: '2 personas', size: '70 m²' }}
+            price="$250"
             period={t('habitaciones.perNight')}
           />
           
@@ -120,11 +119,12 @@ function Habitaciones() {
             features={[
               { icon: 'fa-crown', text: 'Mayordomo personal' },
               { icon: 'fa-bath', text: 'Jacuzzi privado' },
-              { icon: 'fa-wifi', text: 'Wi-Fi premium' },
               { icon: 'fa-glass-cheers', text: 'Minibar exclusivo' },
+              { icon: 'fa-sun', text: 'Balcón con vista panorámica' },
+              { icon: 'fa-wifi', text: 'Wi-Fi de alta velocidad' },
             ]}
-            details={{ guests: '4 personas', size: '100 m²' }}
-            price="$850"
+            details={{ guests: '2 personas', size: '60 m²' }}
+            price="$250"
             period={t('habitaciones.perNight')}
           />
 
@@ -135,16 +135,18 @@ function Habitaciones() {
               '/recursos/IMAGENES/habitaciones/6dormitorio/d6b.jpeg',
               '/recursos/IMAGENES/habitaciones/6dormitorio/d6c.jpeg',
             ]}
-            title="Habitación Ejecutiva"
+            title="Executive Suite"
             description="Diseñada para viajeros de negocios, con escritorio, cafetera premium y acceso al lounge."
             badge="Business"
             features={[
-              { icon: 'fa-briefcase', text: 'Espacio de trabajo' },
-              { icon: 'fa-coffee', text: 'Cafetera Nespresso' },
+              { icon: 'fa-briefcase', text: 'Escritorio' },
+              { icon: 'fa-coffee', text: 'Cafetera' },
+              { icon: 'fa-tv', text: t('habitaciones.smartTv') },
+              { icon: 'fa-bath', text: t('habitaciones.bath') },
               { icon: 'fa-wifi', text: 'Wi-Fi de alta velocidad' },
             ]}
-            details={{ guests: '1 o 2 adultos', size: '35 m²' }}
-            price="$320"
+            details={{ guests: '1/2 adultos', size: '40 m²' }}
+            price="$90"
             period={t('habitaciones.perNight')}
           />
 

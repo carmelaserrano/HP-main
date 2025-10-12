@@ -2,7 +2,7 @@ import '../ESTILOS/Footer.css'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-export default function Footer() {
+export default function Footer({ onPageChange }) {
    const { t } = useTranslation();
   return (
     <footer className="footer">
@@ -18,14 +18,14 @@ export default function Footer() {
           <div className="col-lg-2 col-md-6 mb-4">
             <h5 className="footer-title">{t('footer.titleh5')}</h5>
             <ul className="footer-links">
-              <li><Link to="/" className="footer-link">{t('footer.link1')}</Link></li>
-              <li><Link to="/restaurantes" className="footer-link">{t('footer.link3')}</Link></li>
-              <li><Link to="/habitaciones" className="footer-link">{t('footer.link2')}</Link></li>
-              <li><Link to="/servicios" className="footer-link">{t('footer.link4')}</Link></li>
-              <li><Link to="/actividades" className="footer-link">{t('footer.link5')}</Link></li>
-              <li><Link to="/sobre-nosotros" className="footer-link">{t('footer.link6')}</Link></li>
-              <li><Link to="/contacto" className="footer-link">{t('footer.link7')}</Link></li>
-            </ul>
+              <li><Link to="/" className="footer-link">{t("footer.link1")}</Link></li>
+        <li><Link to="/restaurantes" className="footer-link">{t("footer.link3")}</Link></li>
+        <li><Link to="/habitaciones" className="footer-link">{t("footer.link2")}</Link></li>
+        <li><Link to="/servicios" className="footer-link">{t("footer.link4")}</Link></li>
+        <li><Link to="/actividades" className="footer-link">{t("footer.link5")}</Link></li>
+        <li><Link to="/sobre-nosotros" className="footer-link">{t("footer.link6")}</Link></li>
+        <li><Link to="/contacto" className="footer-link">{t("footer.link7")}</Link></li>
+      </ul>
           </div>
 
           <div className="col-lg-3 col-md-6 mb-4">
@@ -57,7 +57,7 @@ export default function Footer() {
               </a>
 
             </div>
-            <div className="newsletter mt-3">
+            {/*<div className="newsletter mt-3">
               <p className="newsletter-text">{t('footer.message1')}</p>
               <div className="input-group">
                 <input type="email" className="form-control newsletter-input" placeholder="Tu email" />
@@ -65,7 +65,7 @@ export default function Footer() {
                   <i className="fas fa-paper-plane"></i>
                 </button>
               </div>
-            </div>
+            </div>*/}
           </div>
         </div>
 

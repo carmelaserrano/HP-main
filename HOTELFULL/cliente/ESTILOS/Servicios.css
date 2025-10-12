@@ -36,6 +36,7 @@
   padding: 25px 30px 25px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /*scroll-margin-top: 100px; /*ajusta según tu header/padding */
 }
 
 .servicio-card:hover {
@@ -110,17 +111,17 @@
 /* Modal */
 .modal {
   position: fixed;
-  top: 0;
+  top: 25%;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
+  margin-bottom: 30%;
+  background: rgba(255, 255, 255, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 40px;
-  animation: fadeIn 0.3s ease;
-  /* esto me permitio que cuando abra las tarjetas no salga cortada  */
+  padding: 20px;
+  /*z-index: 1000;
+  /*animation: fadeIn 0.3s ease; esto me permitio que cuando abra las tarjetas no salga cortada  */
 
 }
 
@@ -138,12 +139,15 @@
   border-radius: 15px;
   max-width: 600px;
   width: 100%;
-  max-height: calc(100vh - 80px);
+  max-height: 90vh;
+  padding-bottom: 20px;
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
   position: relative;
   animation: slideUp 0.3s ease;
   margin: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  margin-top: 0;
 }
 
 .close-btn {
@@ -232,7 +236,8 @@
 
 /* Formulario de Reserva */
 .reserva-form {
-  padding: 0 30px 30px;
+  padding: 20px 30px 30px;
+  margin-bottom: 30%;
 }
 
 .form-group {
