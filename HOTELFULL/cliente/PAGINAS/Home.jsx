@@ -101,77 +101,74 @@
         {/* Rooms Preview Section */}
         <section className="rooms-preview">
           <div className="rooms-header-section">
-            <span className="section-label">NUESTRAS HABITACIONES</span>
-            <h2>Confort y Elegancia</h2>
-            <p className="rooms-subtitle">Descubre nuestras exclusivas habitaciones con vista al mar</p>
+            <span className="section-label">{t('home.rooms')}</span>
+            <h2>{t('home.roomsText')}</h2>
+            <p className="rooms-subtitle">{t('home.roomsSubtitle')}</p>
           </div>
           <div className="rooms-grid">
             <div className="room-card">
               <div className="room-image-container">
-                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80" alt="Double Room" />
+                <img src="/recursos/IMAGENES/habitaciones/5presidencial/p1.jpeg" alt="Suite Presidencial" />
                 <div className="room-hover-overlay">
                   <ul className="room-amenities-hover">
-                    <li><i className="fas fa-wifi"></i> WiFi gratis</li>
-                    <li><i className="fas fa-tv"></i> TV Smart 50"</li>
-                    <li><i className="fas fa-snowflake"></i> Aire acondicionado</li>
-                    <li><i className="fas fa-concierge-bell"></i> Room service</li>
+                    <li><i className="fas fa-wifi"></i>{t('home.freeWifi')}</li>
+                    <li><i className="fas fa-tv"></i>{t('home.smartTv')}</li>
+                    <li><i className="fas fa-bath"></i> {t('home.jacuzzi')}</li>
+                    <li><i className="fas fa-concierge-bell"></i>{t('home.service')}</li>
                   </ul>
-                  <button className="btn-view-room" onClick={() => navigate('/habitaciones')}>
-                    Ver más
+                  <button className="btn-view-room" onClick={() => navigate('/habitaciones')}>{t('home.viewRoom')}
                   </button>
                 </div>
               </div>
               <div className="room-info">
-                <span className="room-category">OCEAN VIEW</span>
-                <h3>{t('home.doubleRoom')}</h3>
-                <p className="room-description">Vista panorámica al océano con balcón privado</p>
-                <p className="room-price">$199 <span>{t('home.perNight')}</span></p>
+                <span className="room-category">{t('home.view')}</span>
+                <h3>{t('home.hab1')}</h3>
+                <p className="room-description">{t('home.p1')}</p>
+                <p className="room-price">$250 <span>{t('home.perNight')}</span></p>
               </div>
             </div>
 
             <div className="room-card">
               <div className="room-image-container">
-                <img src="https://images.unsplash.com/photo-1566195992011-5f6b21e539aa?w=800&q=80" alt="Premium King Room" />
+                <img src="/recursos/IMAGENES/habitaciones/1dormitorio/d1b.jpeg" alt="Suite Deluxe" />
                 <div className="room-hover-overlay">
                   <ul className="room-amenities-hover">
-                    <li><i className="fas fa-wifi"></i> WiFi gratis</li>
-                    <li><i className="fas fa-tv"></i> TV Smart 55"</li>
-                    <li><i className="fas fa-hot-tub"></i> Jacuzzi</li>
-                    <li><i className="fas fa-concierge-bell"></i> Room service 24/7</li>
+                    <li><i className="fas fa-wifi"></i>{t('home.freeWifi')}</li>
+                    <li><i className="fas fa-tv"></i>{t('home.smartTv')}</li>
+                    <li><i className="fas fa-water"></i>{t('home.view')}</li>
+                    <li><i className="fas fa-bath"></i>{t('home.baño')}</li>
                   </ul>
-                  <button className="btn-view-room" onClick={() => navigate('/habitaciones')}>
-                    Ver más
+                  <button className="btn-view-room" onClick={() => navigate('/habitaciones')}>{t('home.viewRoom')}
                   </button>
                 </div>
               </div>
               <div className="room-info">
-                <span className="room-category">PREMIUM</span>
-                <h3>{t('home.premiumKing')}</h3>
-                <p className="room-description">Suite king con jacuzzi y terraza privada</p>
-                <p className="room-price">$159 <span>{t('home.perNight')}</span></p>
+                <span className="room-category">{t('home.vip')}</span>
+                <h3>{t('home.hab2')}</h3>
+                <p className="room-description">{t('home.p2')}</p>
+                <p className="room-price">$250 <span>{t('home.perNight')}</span></p>
               </div>
             </div>
 
             <div className="room-card">
               <div className="room-image-container">
-                <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80" alt="Deluxe Room" />
+                <img src="/recursos/IMAGENES/habitaciones/2dormitorio/d2b.jpeg" alt="Family Suite" />
                 <div className="room-hover-overlay">
                   <ul className="room-amenities-hover">
-                    <li><i className="fas fa-wifi"></i> WiFi gratis</li>
-                    <li><i className="fas fa-tv"></i> TV Smart 65"</li>
-                    <li><i className="fas fa-couch"></i> Sala de estar</li>
-                    <li><i className="fas fa-utensils"></i> Cocina pequeña</li>
+                    <li><i className="fas fa-wifi"></i>{t('home.freeWifi')}</li>
+                    <li><i className="fas fa-tv"></i>{t('home.tvs')}</li>
+                    <li><i className="fas fa-couch"></i> {t('home.sala')}</li>
+                    <li><i className="fas fa-utensils"></i>{t('home.cocina')}</li>
                   </ul>
-                  <button className="btn-view-room" onClick={() => navigate('/habitaciones')}>
-                    Ver más
+                  <button className="btn-view-room" onClick={() => navigate('/habitaciones')}>{t('home.viewRoom')}
                   </button>
                 </div>
               </div>
               <div className="room-info">
-                <span className="room-category">DELUXE</span>
-                <h3>{t('home.deluxeRoom')}</h3>
-                <p className="room-description">Suite de lujo con sala de estar y cocina</p>
-                <p className="room-price">$198 <span>{t('home.perNight')}</span></p>
+                <span className="room-category">{t('home.depto')}</span>
+                <h3>{t('home.hab3')}</h3>
+                <p className="room-description">{t('home.p3')}</p>
+                <p className="room-price">$410 <span>{t('home.perNight')}</span></p>
               </div>
             </div>
           </div>
@@ -192,18 +189,18 @@
             <div className="carousel-inner">
               <div className="carousel-item active">
                 <div className="testimonial-card">
-                  <p className="testimonial-text">"{t('home.testimonialText')}"</p>
+                  <p className="testimonial-text">"{t('home.testimonialText1')}"</p>
                   <div className="testimonial-rating">
                     ⭐⭐⭐⭐⭐
                   </div>
-                  <p className="testimonial-author">{t('home.testimonialAuthor')}</p>
+                  <p className="testimonial-author">- Alexander Vasquez</p>
                   <img src="https://cdn.worldvectorlogo.com/logos/tripadvisor-1.svg" alt="TripAdvisor" className="tripadvisor-logo" />
                 </div>
               </div>
 
               <div className="carousel-item">
                 <div className="testimonial-card">
-                  <p className="testimonial-text">"La experiencia fue increíble. El personal es muy atento, las instalaciones están impecables y la ubicación es perfecta. Sin duda volveremos pronto. ¡Altamente recomendado!"</p>
+                  <p className="testimonial-text">"{t('home.testimonialText2')}"</p>
                   <div className="testimonial-rating">
                     ⭐⭐⭐⭐⭐
                   </div>
@@ -214,7 +211,7 @@
 
               <div className="carousel-item">
                 <div className="testimonial-card">
-                  <p className="testimonial-text">"Excelente hotel con vistas espectaculares. La habitación era espaciosa y muy cómoda. El desayuno buffet tenía una gran variedad de opciones. Una estadía memorable."</p>
+                  <p className="testimonial-text">"{t('home.testimonialText3')}"</p>
                   <div className="testimonial-rating">
                     ⭐⭐⭐⭐⭐
                   </div>

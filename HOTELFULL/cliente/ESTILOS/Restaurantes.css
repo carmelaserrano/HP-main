@@ -86,23 +86,33 @@
     width: 100%;
   }
 
-  .room-features {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 25px;
-    display: block;
-    width: 100%;
-  }
+.room-features {
+  padding-left: 0; /* ya que vamos a controlar los bullets con ::before */
+  margin-bottom: 25px;
+  display: block;
+  width: 100%;
+}
 
-  .room-features li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    color: #495057;
-    font-size: 0.95rem;
-    padding: 5px 0;
-  }
+.room-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #495057;
+  font-size: 0.95rem;
+  padding: 5px 0;
+  position: relative; /* necesario para que ::before funcione bien */
+}
+
+/* Puntito dorado antes del li */
+.room-features li::before {
+  content: "•";           /* el puntito */
+  color: #d4af37;         /* dorado */
+  font-weight: bold;
+  margin-right: 8px;      /* separación entre puntito y contenido */
+  font-size: 1rem;
+  flex-shrink: 0;         /* para que no se achique si el texto es largo */
+}
 
   .room-features i {
     color: #d4af37;
@@ -262,20 +272,20 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  padding: 12px 0;
+  padding: 10px 1px;
   border-top: 2px solid #e9ecef;
   border-bottom: 2px solid #e9ecef;
   margin-bottom: 15px;
-  width: 100%;
+  width: 90%;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
   color: #495057;
   font-weight: 500;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .detail-item i {
