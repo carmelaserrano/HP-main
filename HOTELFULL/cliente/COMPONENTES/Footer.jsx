@@ -33,7 +33,7 @@ export default function Footer({ onPageChange }) {
             <div className="footer-contact">
               <div className="contact-item">
                 <i className="fas fa-map-marker-alt me-2"></i>
-                <span>1 Knights Key Boulevard, MM 47 Marathon, FL 33050</span>
+                <span>1 Knights Keyy Boulevard, MM 47 Marathon, FL 33050</span>
               </div>
               <div className="contact-item">
                 <i className="fas fa-phone me-2"></i>
