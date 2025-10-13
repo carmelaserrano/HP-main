@@ -166,8 +166,18 @@
     "closing": "En Isla Bella, nos esforzamos por hacer de cada estancia una experiencia única, combinando comodidad, estilo y atención.",
     "cardTitle1": "Restaurantes",
     "cardTitle2": "Actividades",
-    "cardTitle3": "Servicios"
-
+    "cardTitle3": "Servicios",
+    "text1":"Huéspedes Felices",
+    "text2":"Años de Experiencia",
+    "text3":"Satisfacción",
+    "text4":"Premios Recibidos",
+    "reasons":"¿POR QUÉ NOSOTROS?",
+    "galleryTitle":"GALERÍA",
+    "gallerySubtitle":"Descubre nuestras instalaciones",
+    "ready":"¿Listo para una experiencia inolvidable?",
+    "book":"Reserva ahora y disfruta de nuestras ofertas exclusivas",
+    "rooms":"Ver Habitaciones",
+    "contact":"Contactar"
   },
   "contacto": {
     "title": "CONTACTO",
@@ -250,7 +260,47 @@
   },
   "servicios":{
     "title" : "Nuestros Servicios",
-    "subtitle": "Experiencias diseñadas para tu comodidad"
+    "subtitle": "Experiencias diseñadas para tu comodidad",
+    "details": "Ver detalles",
+    "reservar": "Reservar ahora",
+    "name": "Nombre completo *",
+    "email": "Email *",
+    "phone": "Teléfono *",
+    "date": "Fecha *",
+    "people": "Personas *",
+    "message": "Mensaje adicional",
+    "items": {
+    "1": {
+      "titulo": "Restaurante Gourmet",
+      "descripcion": "Experiencia culinaria única",
+      "detalles": "Horario: 7:00 AM - 11:00 PM. Cocina internacional y local. Menú vegetariano disponible."
+    },
+    "2": {
+      "titulo": "Spa & Wellness",
+      "descripcion": "Relájate con tratamientos profesionales",
+      "detalles": "Masajes relajantes, tratamientos faciales, sauna, jacuzzi, yoga y meditación."
+    },
+    "3": {
+      "titulo": "Piscina Infinity",
+      "descripcion": "Vista panorámica al océano",
+      "detalles": "Abierta 24/7. Bar junto a la piscina. Sombrillas y camastros. Área para niños."
+    },
+    "4": {
+      "titulo": "Gimnasio Premium",
+      "descripcion": "Equipamiento de última generación",
+      "detalles": "Abierto 24 horas. Entrenador personal. Clases grupales. Equipo cardiovascular."
+    },
+    "5": {
+      "titulo": "Room Service",
+      "descripcion": "Servicio a la habitación 24/7",
+      "detalles": "Menú completo. Desayuno en cama. Cena romántica. Pedidos especiales."
+    },
+    "6": {
+      "titulo": "Tours & Excursiones",
+      "descripcion": "Descubre la región",
+      "detalles": "Tours privados, excursiones grupales, deportes acuáticos y paseos en barco."
+    }
+  }
   }
 
 }

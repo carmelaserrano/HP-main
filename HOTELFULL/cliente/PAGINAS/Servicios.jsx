@@ -78,50 +78,49 @@ const Servicios = () => {
     });
   };
 
-
-  // -----------------------------------
-  const servicios = [
+  // datos de los servicios
+    const servicios = [
     {
-      id: 1,
-      titulo: "Restaurante Gourmet",
-      descripcion: "Experiencia culinaria única",
-      detalles: "Horario: 7:00 AM - 11:00 PM. Cocina internacional y local. Menú vegetariano disponible.",
-      imagen: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop"
+    id: 1,
+    titulo: t('servicios.items.1.titulo'),
+    descripcion: t('servicios.items.1.descripcion'),
+    detalles: t('servicios.items.1.detalles'),
+    imagen: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop"
     },
     {
-      id: 2,
-      titulo: "Spa & Wellness",
-      descripcion: "Relájate con tratamientos profesionales",
-      detalles: "Masajes relajantes, tratamientos faciales, sauna, jacuzzi, yoga y meditación.",
-      imagen: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=400&fit=crop"
+    id: 2,
+    titulo: t('servicios.items.2.titulo'),
+    descripcion: t('servicios.items.2.descripcion'),
+    detalles: t('servicios.items.2.detalles'),
+    imagen: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=400&fit=crop"
     },
     {
-      id: 3,
-      titulo: "Piscina Infinity",
-      descripcion: "Vista panorámica al océano",
-      detalles: "Abierta 24/7. Bar junto a la piscina. Sombrillas y camastros. Área para niños.",
-      imagen: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=600&h=400&fit=crop"
+    id: 3,
+    titulo: t('servicios.items.3.titulo'),
+    descripcion: t('servicios.items.3.descripcion'),
+    detalles: t('servicios.items.3.detalles'),
+    imagen: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=600&h=400&fit=crop"
     },
     {
-      id: 4,
-      titulo: "Gimnasio Premium",
-      descripcion: "Equipamiento de última generación",
-      detalles: "Abierto 24 horas. Entrenador personal. Clases grupales. Equipo cardiovascular.",
-      imagen: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop"
+    id: 4,
+    titulo: t('servicios.items.4.titulo'),
+    descripcion: t('servicios.items.4.descripcion'),
+    detalles: t('servicios.items.4.detalles'),
+    imagen: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop"
     },
     {
-      id: 5,
-      titulo: "Room Service",
-      descripcion: "Servicio a la habitación 24/7",
-      detalles: "Menú completo. Desayuno en cama. Cena romántica. Pedidos especiales.",
-      imagen: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop"
+    id: 5,
+    titulo: t('servicios.items.5.titulo'),
+    descripcion: t('servicios.items.5.descripcion'),
+    detalles: t('servicios.items.5.detalles'),
+    imagen: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop"
     },
     {
-      id: 6,
-      titulo: "Tours & Excursiones",
-      descripcion: "Descubre la región",
-      detalles: "Tours privados, excursiones grupales, deportes acuáticos y paseos en barco.",
-      imagen: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop"
+    id: 6,
+    titulo: t('servicios.items.6.titulo'),
+    descripcion: t('servicios.items.6.descripcion'),
+    detalles: t('servicios.items.6.detalles'),
+    imagen: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop"
     }
   ];
 
@@ -145,7 +144,7 @@ const Servicios = () => {
             <div className="servicio-imagen">
               <img src={servicio.imagen} alt={servicio.titulo} />
               <div className="servicio-overlay">
-                <button>Ver detalles</button>
+                <button>{t('servicios.details')}</button>
               </div>
             </div>
             <div className="servicio-info">
@@ -167,7 +166,7 @@ const Servicios = () => {
             <h2>{selectedService.titulo}</h2>
             <p className="descripcion">{selectedService.descripcion}</p>
             <p className="detalles">{selectedService.detalles}</p>
-            <button className="reservar-btn" onClick={() => setShowForm(true)}>Reservar ahora</button>
+            <button className="reservar-btn" onClick={() => setShowForm(true)}>{t('servicios.reservar')}</button>
           </div>
         </div>
       )}
@@ -180,7 +179,7 @@ const Servicios = () => {
 
             <form ref={formRef} onSubmit={handleSubmit} className="reserva-form">
               <div className="form-group">
-                <label htmlFor="nombre">Nombre completo *</label>
+                <label htmlFor="nombre">{t('servicios.name')}</label>
                 <input
                   type="text"
                   id="nombre"
@@ -192,7 +191,7 @@ const Servicios = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="email">Email *</label>
+                <label htmlFor="email">{t('servicios.email')}</label>
                 <input
                   type="email"
                   id="email"
@@ -204,7 +203,7 @@ const Servicios = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="telefono">Teléfono *</label>
+                <label htmlFor="telefono">{t('servicios.phone')}</label>
                 <input
                   type="tel"
                   id="telefono"
@@ -217,7 +216,7 @@ const Servicios = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="fecha">Fecha *</label>
+                  <label htmlFor="fecha">{t('servicios.date')}</label>
                   <input
                     type="date"
                     id="fecha"
@@ -229,7 +228,7 @@ const Servicios = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="personas">Personas *</label>
+                  <label htmlFor="personas">{t('servicios.people')}</label>
                   <input
                     type="number"
                     id="personas"
@@ -243,7 +242,7 @@ const Servicios = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="mensaje">Mensaje adicional</label>
+                <label htmlFor="mensaje">{t('servicios.message')}</label>
                 <textarea
                   id="mensaje"
                   name="mensaje"

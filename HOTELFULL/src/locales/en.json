@@ -166,7 +166,18 @@
     "closing": "At Isla Bella, we strive to make every stay a unique experience, combining comfort, style and attention.",
     "cardTitle1": "Restaurants",
     "cardTitle2": "Activities",
-    "cardTitle3": "Services"
+    "cardTitle3": "Services",
+    "text1": "Happy Guests",
+    "text2": "Years of Experience",
+    "text3": "Satisfaction",
+    "text4": "Awards Received",
+    "reasons": "WHY US?",
+    "galleryTitle": "GALLERY",
+    "gallerySubtitle": "Discover our facilities",
+    "ready": "Ready for an unforgettable experience?",
+    "book": "Book now and enjoy our exclusive offers",
+    "rooms": "View Rooms",
+    "contact": "Contact"
   },
   "contacto": {
     "title": "CONTACT",
@@ -249,7 +260,47 @@
 },
 "servicios":{
     "title" : "Our Services",
-    "subtitle": "Experiences designed for your comfort"
+    "subtitle": "Experiences designed for your comfort",
+    "details": "View details",
+    "reservar": "Book now",
+    "name": "Full name *",
+    "email": "Email *",
+    "phone": "Phone *",
+    "date": "Date *",
+    "people": "People *",
+    "message": "Additional message",
+    "items": {
+    "1": {
+      "titulo": "Gourmet Restaurant",
+      "descripcion": "A unique culinary experience",
+      "detalles": "Hours: 7:00 AM - 11:00 PM. International and local cuisine. Vegetarian menu available."
+    },
+    "2": {
+      "titulo": "Spa & Wellness",
+      "descripcion": "Relax with professional treatments",
+      "detalles": "Relaxing massages, facial treatments, sauna, jacuzzi, yoga and meditation."
+    },
+    "3": {
+      "titulo": "Infinity Pool",
+      "descripcion": "Panoramic ocean view",
+      "detalles": "Open 24/7. Poolside bar. Umbrellas and loungers. Children's area."
+    },
+    "4": {
+      "titulo": "Premium Gym",
+      "descripcion": "State-of-the-art equipment",
+      "detalles": "Open 24 hours. Personal trainer. Group classes. Cardio equipment."
+    },
+    "5": {
+      "titulo": "Room Service",
+      "descripcion": "24/7 in-room service",
+      "detalles": "Full menu. Breakfast in bed. Romantic dinner. Special orders."
+    },
+    "6": {
+      "titulo": "Tours & Excursions",
+      "descripcion": "Discover the region",
+      "detalles": "Private tours, group excursions, water sports, and boat trips."
+    }
+  }
   }
 
 }

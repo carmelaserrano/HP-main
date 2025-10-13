@@ -32,7 +32,7 @@ function SobreNosotros() {
       <section className="sobre-historia-section">
         <div className="sobre-historia-content">
           <div className="sobre-historia-text">
-            <span className="section-label-sobre">NUESTRA HISTORIA</span>
+            <span className="section-label-sobre">{t('sobreNosotros.historyTitle')}</span>
             <h2>{t('sobreNosotros.historyTitle')}</h2>
             <div className="timeline-content">
               <div className="timeline-item">
@@ -81,28 +81,28 @@ function SobreNosotros() {
               <i className="fas fa-users"></i>
             </div>
             <h3 className="stat-number">2000+</h3>
-            <p className="stat-label">Huéspedes Felices</p>
+            <p className="stat-label">{t('sobreNosotros.text1')}</p>
           </div>
           <div className="stat-item">
             <div className="stat-icon">
               <i className="fas fa-award"></i>
             </div>
             <h3 className="stat-number">15</h3>
-            <p className="stat-label">Años de Experiencia</p>
+            <p className="stat-label">{t('sobreNosotros.text2')}</p>
           </div>
           <div className="stat-item">
             <div className="stat-icon">
               <i className="fas fa-star"></i>
             </div>
             <h3 className="stat-number">95%</h3>
-            <p className="stat-label">Satisfacción</p>
+            <p className="stat-label">{t('sobreNosotros.text3')}</p>
           </div>
           <div className="stat-item">
             <div className="stat-icon">
               <i className="fas fa-trophy"></i>
             </div>
             <h3 className="stat-number">12</h3>
-            <p className="stat-label">Premios Recibidos</p>
+            <p className="stat-label">{t('sobreNosotros.text4')}</p>
           </div>
         </div>
       </section>
@@ -110,7 +110,7 @@ function SobreNosotros() {
       {/* Why Choose Us Section */}
       <section className="sobre-why-section">
         <div className="sobre-why-content">
-          <span className="section-label-sobre">¿POR QUÉ NOSOTROS?</span>
+          <span className="section-label-sobre">{t('sobreNosotros.reasons')}</span>
           <h2>{t('sobreNosotros.whyTitle')}</h2>
 
           <div className="reasons-grid">
@@ -171,8 +171,8 @@ function SobreNosotros() {
 
       {/* Gallery Section */}
       <section className="sobre-gallery-section">
-        <span className="section-label-sobre">GALERÍA</span>
-        <h2>Descubre Nuestras Instalaciones</h2>
+        <span className="section-label-sobre">{t('sobreNosotros.galleryTitle')}</span>
+        <h2>{t('sobreNosotros.gallerySubtitle')}</h2>
         <div className="gallery-grid">
           {galleryImages.map((img, index) => (
             <div key={index} className="gallery-item">
@@ -185,14 +185,14 @@ function SobreNosotros() {
       {/* CTA Section */}
       <section className="sobre-cta-section">
         <div className="cta-content">
-          <h2>¿Listo para una experiencia inolvidable?</h2>
-          <p>Reserva ahora y disfruta de nuestras ofertas exclusivas</p>
+          <h2>{t('sobreNosotros.ready')}</h2>
+          <p>{t('sobreNosotros.book')}</p>
           <div className="cta-buttons">
             <button className="btn-cta-primary" onClick={() => navigate('/habitaciones')}>
-              Ver Habitaciones
+              {t('sobreNosotros.rooms')}
             </button>
             <button className="btn-cta-secondary" onClick={() => navigate('/contacto')}>
-              Contactar
+              {t('sobreNosotros.contact')}
             </button>
           </div>
         </div>
