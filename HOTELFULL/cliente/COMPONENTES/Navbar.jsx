@@ -1,9 +1,11 @@
 import '../ESTILOS/Navbar.css'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function Navbar() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -21,7 +23,8 @@ function Navbar() {
             <a href="https://www.facebook.com/IslaBellaBeachResort/"><i className="fab fa-facebook-f"></i></a>
             <a href="https://www.instagram.com/islabellabeachresort/?hl=es"><i className="fab fa-instagram"></i></a>
           </div>
-          <button className="btn-booking-top">{t('navbar.bookNow')}</button>
+          {/*<button className="btn-cta-secondary">{t('navbar.bookNow')}</button>*/}
+          <button className="btn-booking-top" onClick={() => navigate('/login')}>LOGIN</button>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import Contacto from '../cliente/PAGINAS/Contacto'
 import Actividades from '../cliente/PAGINAS/Actividades'
 import Servicios from '../cliente/PAGINAS/Servicios'
 import ScrollToTop from '../cliente/COMPONENTES/ScrollToTop'
+import Login from '../cliente/PAGINAS/Login' 
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/servicios" element={<Servicios />} />
+
+            {/* 🔹 Nueva ruta de login */}
+            <Route path="/login" element={<Login />} />
           </Routes>
         </div>
 
