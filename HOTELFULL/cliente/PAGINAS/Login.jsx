@@ -31,7 +31,7 @@ function Login() {
       });
 
       if (signInError) {
-        setError('Credenciales incorrectas. Por favor, intenta de nuevo.');
+        setError('Contraseña o usuario incorrecto. Por favor, intenta de nuevo.');
         setLoading(false);
         return;
       }
