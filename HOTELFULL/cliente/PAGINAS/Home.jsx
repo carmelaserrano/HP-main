@@ -1,11 +1,13 @@
   import '../ESTILOS/Home.css'
   import { useTranslation } from 'react-i18next'
   import { useNavigate } from 'react-router-dom'
+  import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
   function Home() {
     const navigate = useNavigate();
     const { t } = useTranslation();
     return (
+      <PageTransition>
       <div>
         <div className="hero-section">
         <video className="hero-video" autoPlay muted loop>
@@ -223,6 +225,7 @@
         </section>
 
       </div>
+      </PageTransition>
     )
   }
 

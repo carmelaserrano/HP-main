@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../backend/supabaseClient';
 import '../ESTILOS/Registro.css';
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function Registro() {
   const [nombre, setNombre] = useState('');
@@ -78,6 +79,7 @@ function Registro() {
   };
 
   return (
+    <PageTransition>
     <div className="registro-page">
       <div className="registro-container">
         <div className="registro-header">
@@ -162,6 +164,7 @@ function Registro() {
         </form>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

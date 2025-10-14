@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import '../ESTILOS/Servicios.css'
 import { useTranslation } from 'react-i18next'
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 // boto de reservar que abre un formulario modal para reservar el servicio seleccionado
 
@@ -125,6 +126,7 @@ const Servicios = () => {
   ];
 
   return (
+    <PageTransition>
     <div className="servicios-page">
       <div className="servicios-header">
         <h1>{t('servicios.title')}</h1>
@@ -263,6 +265,7 @@ const Servicios = () => {
         </div>
       )}
     </div>
+    </PageTransition>
   )
 }
 

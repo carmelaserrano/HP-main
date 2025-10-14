@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../backend/supabaseClient';
 import '../ESTILOS/Login.css';
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -69,6 +70,7 @@ function Login() {
   };
 
   return (
+    <PageTransition>
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
@@ -87,12 +89,11 @@ function Login() {
           <div className="form-group">
             <label htmlFor="email">Correo Electrónico</label>
             <div className="input-wrapper">
-              <span className="input-icon">📧</span>
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="tu@email.com"
+                placeholder=" tu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
@@ -104,7 +105,6 @@ function Login() {
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
             <div className="input-wrapper">
-              <span className="input-icon">🔒</span>
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -131,9 +131,9 @@ function Login() {
               <input type="checkbox" />
               <span>Recordarme</span>
             </label>
-            <a href="/recuperar-password" className="forgot-password">
+            <Link to="/recuperar-password" className="forgot-password">
               ¿Olvidaste tu contraseña?
-            </a>
+            </Link>
           </div>
 
           <button type="submit" className="login-button" disabled={loading}>
@@ -148,11 +148,12 @@ function Login() {
           </button>
 
           <div className="register-link">
-            ¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link>
+            ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
           </div>
         </form>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

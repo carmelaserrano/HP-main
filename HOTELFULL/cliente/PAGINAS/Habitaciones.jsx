@@ -2,11 +2,13 @@ import '../ESTILOS/Habitaciones.css'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import RoomCard from '../COMPONENTES/RoomCard';
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function Habitaciones() {
   const { t } = useTranslation();
 
   return (
+    <PageTransition>
     <div className="habitaciones-page">
       <div className="hab-header">
         <h1>{t('habitaciones.title')}</h1>
@@ -155,6 +157,7 @@ function Habitaciones() {
       </div>
 
     </div>
+    </PageTransition>
   )
 }
 

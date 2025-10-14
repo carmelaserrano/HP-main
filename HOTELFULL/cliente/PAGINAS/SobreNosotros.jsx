@@ -2,6 +2,7 @@ import '../ESTILOS/SobreNosotros.css'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function SobreNosotros() {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ function SobreNosotros() {
   ];
 
   return (
+    <PageTransition>
     <div className="sobre-nosotros-page">
 
       {/* Hero Header with Background Image */}
@@ -199,6 +201,7 @@ function SobreNosotros() {
       </section>
 
     </div>
+    </PageTransition>
   );
 }
 

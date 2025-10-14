@@ -13,6 +13,8 @@ import Servicios from '../cliente/PAGINAS/Servicios'
 import ScrollToTop from '../cliente/COMPONENTES/ScrollToTop'
 import Login from '../cliente/PAGINAS/Login'
 import Registro from '../cliente/PAGINAS/Registro'
+import RecuperarPassword from '../cliente/PAGINAS/RecuperarPassword'
+import ResetPassword from '../cliente/PAGINAS/ResetPassword'
 import PageTransition from '../cliente/COMPONENTES/PageTransition'
 
 // Importar dashboards
@@ -30,7 +32,7 @@ function App() {
       <div>
         <Navbar />
 
-        <PageTransition>
+        
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/habitaciones" element={<Habitaciones />} />
@@ -41,6 +43,8 @@ function App() {
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
+            <Route path="/recuperar-password" element={<RecuperarPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Rutas protegidas por rol */}
             <Route 
@@ -70,7 +74,7 @@ function App() {
               } 
             />
           </Routes>
-        </PageTransition>
+       
 
         <Footer />
       </div>

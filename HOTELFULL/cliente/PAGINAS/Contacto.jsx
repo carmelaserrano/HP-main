@@ -2,6 +2,7 @@ import '../ESTILOS/Contacto.css'
 import { useState } from 'react'
 import emailjs from '@emailjs/browser'
 import { useTranslation } from 'react-i18next'
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function Contacto() {
   const { t } = useTranslation();
@@ -34,7 +35,10 @@ function Contacto() {
       });
   };
 
+ 
+
   return (
+     <PageTransition>
     <div className="contacto-page">
       {/* Hero section */}
       <div className="contact-hero">
@@ -156,6 +160,7 @@ function Contacto() {
 
 
     </div>
+     </PageTransition>
   )
 }
 

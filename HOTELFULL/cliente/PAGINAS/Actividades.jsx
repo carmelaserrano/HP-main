@@ -2,6 +2,7 @@ import React from 'react'
 import '../ESTILOS/Actividades.css'
 import '../ESTILOS/SobreNosotros.css'
 import { useTranslation } from 'react-i18next'
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function Actividades() {
   const { t } = useTranslation();
@@ -9,6 +10,7 @@ function Actividades() {
     "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=900&fit=crop",
   ]
   return (
+    <PageTransition>
     <div className="actividades-page">
       <header className="actividades-header">
         <h1>{t('actividades.title')}</h1>
@@ -129,6 +131,7 @@ function Actividades() {
 
 
     </div>
+    </PageTransition>
     
   );
 }

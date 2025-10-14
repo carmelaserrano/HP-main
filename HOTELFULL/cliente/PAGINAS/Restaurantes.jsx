@@ -1,6 +1,7 @@
 import '../ESTILOS/Restaurantes.css'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 function Restaurantes() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ function Restaurantes() {
 
 
   return (
+    <PageTransition>
     <div className="restaurantes-page">
       <div className="rest-header">
         <h1>{t('restaurantes.title')}</h1>
@@ -108,6 +110,7 @@ function Restaurantes() {
       </div>
 
     </div>
+    </PageTransition>
   )
 }
 
