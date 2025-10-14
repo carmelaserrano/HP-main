@@ -11,7 +11,8 @@ import Contacto from '../cliente/PAGINAS/Contacto'
 import Actividades from '../cliente/PAGINAS/Actividades'
 import Servicios from '../cliente/PAGINAS/Servicios'
 import ScrollToTop from '../cliente/COMPONENTES/ScrollToTop'
-import Login from '../cliente/PAGINAS/Login' 
+import Login from '../cliente/PAGINAS/Login'
+import PageTransition from '../cliente/COMPONENTES/PageTransition' 
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
       <div>
         <Navbar />
 
-        <div className="page-container fade-in">
+        <PageTransition>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/habitaciones" element={<Habitaciones />} />
@@ -33,7 +34,7 @@ function App() {
             {/* 🔹 Nueva ruta de login */}
             <Route path="/login" element={<Login />} />
           </Routes>
-        </div>
+        </PageTransition>
 
         <Footer />
       </div>

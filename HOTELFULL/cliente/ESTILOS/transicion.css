@@ -1,7 +1,8 @@
 /* Transiciones de página */
 .page-container {
-  animation-duration: 0.3s;
+  animation-duration: 0.5s;
   animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
 }
 
 .fade-in {
@@ -9,13 +10,13 @@
 }
 
 .fade-out {
-  animation-name: fadeOut;
+  animation-name:fadeOut;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(-30px);
   }
   to {
     opacity: 1;
@@ -30,7 +31,7 @@
   }
   to {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-30px);
   }
 }
 
