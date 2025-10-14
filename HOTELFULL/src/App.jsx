@@ -12,7 +12,15 @@ import Actividades from '../cliente/PAGINAS/Actividades'
 import Servicios from '../cliente/PAGINAS/Servicios'
 import ScrollToTop from '../cliente/COMPONENTES/ScrollToTop'
 import Login from '../cliente/PAGINAS/Login'
-import PageTransition from '../cliente/COMPONENTES/PageTransition' 
+import PageTransition from '../cliente/COMPONENTES/PageTransition'
+
+// Importar dashboards
+import HuespedDashboard from '../cliente/COMPONENTES/huesped/HuespedDashboard'
+import OperadorDashboard from '../cliente/COMPONENTES/operador/OperadorDashboard'
+import AdminDashboard from '../cliente/COMPONENTES/admin/AdminDashboard'
+
+// Importar ProtectedRoute
+import ProtectedRoute from '../cliente/COMPONENTES/ProtectedRoute'
 
 function App() {
   return (
@@ -30,9 +38,35 @@ function App() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/servicios" element={<Servicios />} />
-
-            {/* 🔹 Nueva ruta de login */}
             <Route path="/login" element={<Login />} />
+
+            {/* Rutas protegidas por rol */}
+            <Route 
+              path="/huesped" 
+              element={
+                <ProtectedRoute allowedRoles={['huesped']}>
+                  <HuespedDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/operador" 
+              element={
+                <ProtectedRoute allowedRoles={['operador', 'admin']}>
+                  <OperadorDashboard />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </PageTransition>
 
