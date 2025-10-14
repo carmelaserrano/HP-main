@@ -43,16 +43,6 @@
               </select>
             </div>
 
-            <div className="form-group">
-              <label>{t('home.room')}</label>
-              <select className="form-input">
-                <option>1 {t('home.room')}</option>
-                <option>2 {t('home.rooms')}</option>
-                <option>3 {t('home.rooms')}</option>
-                <option>4+ {t('home.rooms')}</option>
-              </select>
-            </div>
-
             <button className="btn-check-availability">{t('home.checkAvailability')}</button>
           </div>
         </div>

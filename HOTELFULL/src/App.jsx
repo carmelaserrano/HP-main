@@ -12,6 +12,7 @@ import Actividades from '../cliente/PAGINAS/Actividades'
 import Servicios from '../cliente/PAGINAS/Servicios'
 import ScrollToTop from '../cliente/COMPONENTES/ScrollToTop'
 import Login from '../cliente/PAGINAS/Login'
+import Registro from '../cliente/PAGINAS/Registro'
 import PageTransition from '../cliente/COMPONENTES/PageTransition'
 
 // Importar dashboards
@@ -39,6 +40,7 @@ function App() {
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Registro />} />
 
             {/* Rutas protegidas por rol */}
             <Route 

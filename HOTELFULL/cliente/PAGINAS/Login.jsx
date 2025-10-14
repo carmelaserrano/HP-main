@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../backend/supabaseClient';
 import '../ESTILOS/Login.css';
 
@@ -148,7 +148,7 @@ function Login() {
           </button>
 
           <div className="register-link">
-            ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
+            ¿No tienes cuenta? <Link to="/registro">Regístrate aquí</Link>
           </div>
         </form>
       </div>
