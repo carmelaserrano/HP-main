@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../backend/supabaseClient.jsx';
 
 function RoomCard({ images, title, description, badge, features, details, price, period }) {
   const [currentImage, setCurrentImage] = React.useState(0);
+  const navigate = useNavigate();
 
   const nextImage = () => {
     setCurrentImage((prev) => (prev + 1) % images.length);
@@ -9,6 +12,31 @@ function RoomCard({ images, title, description, badge, features, details, price,
 
   const prevImage = () => {
     setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleReservar = async () => {
+    // Verificar si el usuario está autenticado
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // Preparar datos de la habitación para la reserva
+    const roomData = {
+      title,
+      price: price.replace('$', ''),
+      badge,
+      details,
+      image: images[0]
+    };
+
+    // Guardar en localStorage para usar después del login/registro
+    localStorage.setItem('pendingReservation', JSON.stringify(roomData));
+
+    if (!session) {
+      // Si no está autenticado, redirigir al login
+      navigate('/login', { state: { from: 'reservation', roomData } });
+    } else {
+      // Si está autenticado, ir al dashboard de huésped con los datos
+      navigate('/huesped/dashboard', { state: { reservationData: roomData } });
+    }
   };
 
   return (
@@ -66,7 +94,7 @@ function RoomCard({ images, title, description, badge, features, details, price,
           <span className="period">{period}</span>
         </div>
 
-        <button className="btn-room">
+        <button className="btn-room" onClick={handleReservar}>
           <i className="fas fa-calendar-check"></i> Reservar ahora
         </button>
       </div>

@@ -87,7 +87,7 @@ function ResetPassword() {
           <div className="form-group">
             <label htmlFor="password">Nueva Contraseña</label>
             <div className="input-wrapper">
-              <span className="input-icon">🔒</span>
+              
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -112,7 +112,7 @@ function ResetPassword() {
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirmar Contraseña</label>
             <div className="input-wrapper">
-              <span className="input-icon">🔒</span>
+              
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"

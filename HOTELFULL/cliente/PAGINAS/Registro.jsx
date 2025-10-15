@@ -52,7 +52,7 @@ function Registro() {
       }
 
       // Guardar información adicional del usuario
-      const { error: insertError } = await supabase.from('usuarios').insert([
+      const { error: insertError } = await supabase.from('profiles').insert([
         {
           id: data.user.id,
           nombre: nombre,
@@ -68,8 +68,18 @@ function Registro() {
         return;
       }
 
-      alert('Registro exitoso! Ahora puedes iniciar sesión.');
-      navigate('/login');
+      // Verificar si hay una reserva pendiente
+      const pendingReservation = localStorage.getItem('pendingReservation');
+
+      alert('Registro exitoso! Bienvenido.');
+
+      // Si hay reserva pendiente, ir al dashboard con los datos de reserva
+      if (pendingReservation) {
+        const roomData = JSON.parse(pendingReservation);
+        navigate('/huesped/dashboard', { state: { reservationData: roomData } });
+      } else {
+        navigate('/huesped/dashboard');
+      }
     } catch (err) {
       setError('Ocurrió un error inesperado. Por favor, intenta de nuevo.');
       console.error('Error de registro:', err);
@@ -82,6 +92,14 @@ function Registro() {
     <PageTransition>
     <div className="registro-page">
       <div className="registro-container">
+        <button
+          onClick={() => navigate('/')}
+          className="btn-back"
+          type="button"
+        >
+          ← Volver al inicio
+        </button>
+
         <div className="registro-header">
           <h1>Crear Cuenta</h1>
           <p>Registrate para hacer reservas</p>

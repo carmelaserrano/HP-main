@@ -18,9 +18,9 @@ import ResetPassword from '../cliente/PAGINAS/ResetPassword'
 import PageTransition from '../cliente/COMPONENTES/PageTransition'
 
 // Importar dashboards
-import HuespedDashboard from '../cliente/COMPONENTES/huesped/HuespedDashboard'
-import OperadorDashboard from '../cliente/COMPONENTES/operador/OperadorDashboard'
-import AdminDashboard from '../cliente/COMPONENTES/admin/AdminDashboard'
+import HuespedDashboard from '../backend/COMPONENTES/huesped/HuespedDashboard'
+import OperadorDashboard from '../backend/COMPONENTES/operador/OperadorDashboard'
+import AdminDashboard from '../backend/COMPONENTES/admin/AdminDashboard'
 
 // Importar ProtectedRoute
 import ProtectedRoute from '../cliente/COMPONENTES/ProtectedRoute'
@@ -28,56 +28,50 @@ import ProtectedRoute from '../cliente/COMPONENTES/ProtectedRoute'
 function App() {
   return (
     <BrowserRouter>
-    <ScrollToTop />
-      <div>
-        <Navbar />
+      <ScrollToTop />
+      <Routes>
+        {/* Rutas con Navbar y Footer */}
+        <Route path="/" element={<><Navbar /><Home /><Footer /></>} />
+        <Route path="/habitaciones" element={<><Navbar /><Habitaciones /><Footer /></>} />
+        <Route path="/rooms" element={<><Navbar /><Habitaciones /><Footer /></>} />
+        <Route path="/restaurantes" element={<><Navbar /><Restaurantes /><Footer /></>} />
+        <Route path="/sobre-nosotros" element={<><Navbar /><SobreNosotros /><Footer /></>} />
+        <Route path="/contacto" element={<><Navbar /><Contacto /><Footer /></>} />
+        <Route path="/actividades" element={<><Navbar /><Actividades /><Footer /></>} />
+        <Route path="/servicios" element={<><Navbar /><Servicios /><Footer /></>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/recuperar-password" element={<RecuperarPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-        
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/habitaciones" element={<Habitaciones />} />
-            <Route path="/restaurantes" element={<Restaurantes />} />
-            <Route path="/sobre-nosotros" element={<SobreNosotros />} />
-            <Route path="/contacto" element={<Contacto />} />
-            <Route path="/actividades" element={<Actividades />} />
-            <Route path="/servicios" element={<Servicios />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/registro" element={<Registro />} />
-            <Route path="/recuperar-password" element={<RecuperarPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+        {/* Rutas protegidas por rol - SIN Navbar y Footer */}
+        <Route
+          path="/huesped/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['huesped']}>
+              <HuespedDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-            {/* Rutas protegidas por rol */}
-            <Route 
-              path="/huesped" 
-              element={
-                <ProtectedRoute allowedRoles={['huesped']}>
-                  <HuespedDashboard />
-                </ProtectedRoute>
-              } 
-            />
+        <Route
+          path="/operador/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['operador', 'admin']}>
+              <OperadorDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-            <Route 
-              path="/operador" 
-              element={
-                <ProtectedRoute allowedRoles={['operador', 'admin']}>
-                  <OperadorDashboard />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-          </Routes>
-       
-
-        <Footer />
-      </div>
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   )
 }

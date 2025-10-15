@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../ESTILOS/Dashboard.css';
-import { supabase } from '../../../backend/supabaseClient.jsx'
+import '../../../cliente/ESTILOS/Dashboard.css';
+import { supabase } from '../../supabaseClient.jsx'
 function OperadorDashboard() {
   const [user, setUser] = useState(null);
   const [reservasHoy, setReservasHoy] = useState([]);

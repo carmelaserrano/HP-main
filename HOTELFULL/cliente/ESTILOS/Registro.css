@@ -57,6 +57,30 @@
   overflow: hidden;
 }
 
+.btn-back {
+  background: transparent;
+  border: 2px solid #d4af37;
+  color: #19191a;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 15px 0 -10px 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.btn-back:hover {
+  background: #d4af37;
+  color: white;
+  transform: translateX(-3px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

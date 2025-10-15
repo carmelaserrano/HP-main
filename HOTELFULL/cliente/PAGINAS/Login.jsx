@@ -39,7 +39,7 @@ function Login() {
 
       // Obtener el rol del usuario
       const { data: userData, error: userError } = await supabase
-        .from('usuarios')
+        .from('profiles')
         .select('rol')
         .eq('id', data.user.id)
         .single();
@@ -50,6 +50,9 @@ function Login() {
         return;
       }
 
+      // Verificar si hay una reserva pendiente
+      const pendingReservation = localStorage.getItem('pendingReservation');
+
       // Redirigir según el rol
       const rol = userData.rol;
       if (rol === 'admin') {
@@ -57,7 +60,13 @@ function Login() {
       } else if (rol === 'operador') {
         navigate('/operador/dashboard');
       } else if (rol === 'huesped') {
-        navigate('/huesped/dashboard');
+        // Si hay reserva pendiente, ir al dashboard con los datos de reserva
+        if (pendingReservation) {
+          const roomData = JSON.parse(pendingReservation);
+          navigate('/huesped/dashboard', { state: { reservationData: roomData } });
+        } else {
+          navigate('/huesped/dashboard');
+        }
       } else {
         navigate('/');
       }
@@ -73,6 +82,14 @@ function Login() {
     <PageTransition>
     <div className="login-page">
       <div className="login-container">
+        <button
+          onClick={() => navigate('/')}
+          className="btn-back"
+          type="button"
+        >
+          ← Volver al inicio
+        </button>
+
         <div className="login-header">
           <h1>Bienvenido</h1>
           <p>Inicia sesión para continuar</p>
