@@ -98,10 +98,10 @@ function AdminDashboard() {
   };
 
   const handleToggleHabitacion = async (id, currentEstado) => {
-    console.log('🔄 Toggle habitación:', { id, currentEstado });
+    console.log(' Toggle habitación:', { id, currentEstado });
     // Cambiar entre 'disponible' y 'mantenimiento' (en vez de 'deshabilitada')
     const nuevoEstado = currentEstado === 'disponible' ? 'mantenimiento' : 'disponible';
-    console.log('➡️ Nuevo estado:', nuevoEstado);
+    console.log(' Nuevo estado:', nuevoEstado);
 
     const { error, data } = await supabase
       .from('habitaciones')
@@ -110,7 +110,7 @@ function AdminDashboard() {
       .select();
 
     if (error) {
-      console.error('❌ Error completo:', {
+      console.error(' Error completo:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
@@ -118,16 +118,16 @@ function AdminDashboard() {
       });
       alert('Error al cambiar estado: ' + error.message + '\nDetalles: ' + (error.details || error.hint || 'Sin más información'));
     } else {
-      console.log('✅ Actualizado exitosamente:', data);
+      console.log('Actualizado exitosamente:', data);
       await loadHabitaciones();
     }
   };
 
   const handleToggleOperador = async (id, currentActivo) => {
-    console.log('🔄 Toggle operador:', { id, currentActivo });
+    console.log(' Toggle operador:', { id, currentActivo });
     // Cambiar entre true (activo) y false (deshabilitado)
     const nuevoActivo = !currentActivo;
-    console.log('➡️ Nuevo activo:', nuevoActivo);
+    console.log(' Nuevo activo:', nuevoActivo);
 
     const { error, data } = await supabase
       .from('profiles')
@@ -136,10 +136,10 @@ function AdminDashboard() {
       .select();
 
     if (error) {
-      console.error('❌ Error al actualizar operador:', error);
+      console.error(' Error al actualizar operador:', error);
       alert('Error al cambiar estado del operador: ' + error.message);
     } else {
-      console.log('✅ Operador actualizado:', data);
+      console.log(' Operador actualizado:', data);
       await loadOperadores();
     }
   };
@@ -162,7 +162,7 @@ function AdminDashboard() {
     <div className="dashboard-container">
       {/* Header */}
       <div className="dashboard-header">
-        <h1>👑 Panel de Administrador - {user?.nombre}</h1>
+        <h1>Panel de Administrador - {user?.nombre}</h1>
         <button onClick={handleLogout} className="btn-logout">
           Cerrar Sesión
         </button>
@@ -174,19 +174,19 @@ function AdminDashboard() {
           className={activeSection === 'dashboard' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('dashboard')}
         >
-          📊 Dashboard
+           Dashboard
         </button>
         <button
           className={activeSection === 'operadores' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('operadores')}
         >
-          👥 Operadores
+           Operadores
         </button>
         <button
           className={activeSection === 'habitaciones' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('habitaciones')}
         >
-          🛏️ Habitaciones
+           Habitaciones
         </button>
       </div>
 
@@ -229,7 +229,7 @@ function AdminDashboard() {
 
             {/* Gráfico Simple de Barras */}
             <div className="dashboard-card">
-              <h2>📊 Gráfico de Ocupación</h2>
+              <h2>Gráfico de Ocupación</h2>
               <div className="simple-chart">
                 <div className="chart-bar-group">
                   <div className="chart-label">Disponibles</div>
@@ -275,7 +275,7 @@ function AdminDashboard() {
         {activeSection === 'operadores' && (
           <div className="dashboard-card">
             <div className="section-header">
-              <h2>👥 Gestión de Operadores</h2>
+              <h2> Gestión de Operadores</h2>
               <button className="btn-primary" onClick={() => setShowNuevoOperador(true)}>
                 + Nuevo Operador
               </button>
@@ -327,7 +327,7 @@ function AdminDashboard() {
         {activeSection === 'habitaciones' && (
           <div className="dashboard-card">
             <div className="section-header">
-              <h2>🛏️ Gestión de Habitaciones</h2>
+              <h2> Gestión de Habitaciones</h2>
               <button className="btn-primary" onClick={() => setShowNuevaHabitacion(true)}>
                 + Nueva Habitación
               </button>
@@ -545,7 +545,7 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>{habitacion ? '✏️ Editar Habitación' : '➕ Nueva Habitación'}</h2>
+        <h2>{habitacion ? ' Editar Habitación' : 'Nueva Habitación'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Número de Habitación</label>
@@ -749,7 +749,7 @@ function ModalOperador({ onClose, onSuccess, operador }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>{operador ? '✏️ Editar Operador' : '➕ Nuevo Operador'}</h2>
+        <h2>{operador ? ' Editar Operador' : ' Nuevo Operador'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Nombre Completo</label>
