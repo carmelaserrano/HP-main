@@ -1,8 +1,10 @@
 import '../ESTILOS/Contacto.css'
-import { useState } from 'react'
+import { useState, useEffect} from 'react'
 import emailjs from '@emailjs/browser'
 import { useTranslation } from 'react-i18next'
 import PageTransition from '../COMPONENTES/PageTransition.jsx'
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
+import Weather from "../COMPONENTES/Weather.jsx";
 
 function Contacto() {
   const { t } = useTranslation();
@@ -34,8 +36,22 @@ function Contacto() {
         }, 10000);
       });
   };
+  // 📍 Coordenadas del hotel 
+  const hotelUbicacion = { lat: 24.7070, lng: -81.1201 };
 
- 
+  const mapContainerStyle = {
+    width: '100%',
+    height: '300px',
+    borderRadius: '12px'
+  };
+
+  const mapOptions = {
+    zoom: 15,
+    center: hotelUbicacion,
+    disableDefaultUI: false,
+  };
+  
+
 
   return (
      <PageTransition>
@@ -108,18 +124,18 @@ function Contacto() {
             </form>
           </div>
 
-          {/* Mapa y información */}
-          <div className="contact-info-section">
-            <div className="map-container">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56883.77401460904!2d-81.14457959321989!3d24.714790935875975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d0de5f36dfc985%3A0x9b33a2bc9ce2b217!2sIsla%20Bella%20Beach%20Resort%20%26%20Spa!5e0!3m2!1ses!2sar!4v1759528474731!5m2!1ses!2sar"
-                width="100%"
-                height="300"
-                allowFullScreen=""
-                loading="lazy"
-                title="Ubicación del hotel"
-              ></iframe>
-            </div>
+             {/* 🗺️ Mapa con Google Maps API */}
+            <div className="contact-info-section">
+              <div className="map-container">
+                <LoadScript googleMapsApiKey="AIzaSyCi4kNgfdXUOFezo1mcRUwbkKDjz33nKIY">
+                  <GoogleMap
+                    mapContainerStyle={mapContainerStyle}
+                    {...mapOptions}
+                  >
+                    <Marker position={hotelUbicacion} />
+                  </GoogleMap>
+                </LoadScript>
+              </div>
 
             <div className="contact-details">
               <div className="detail-item">
@@ -157,6 +173,7 @@ function Contacto() {
           </div>
         </div>
       </div>
+      <Weather />
 
 
     </div>
