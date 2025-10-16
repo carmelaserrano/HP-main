@@ -301,6 +301,11 @@
       "detalles": "Private tours, group excursions, water sports, and boat trips."
     }
   }
-  }
+  },
+  "weather": {
+  "title": "Weather at Isla Bella Hotel",
+  "loading": "Loading weather...",
+  "error": "Unable to load weather"
+}
 
 }

@@ -301,6 +301,11 @@
       "detalles": "Tours privados, excursiones grupales, deportes acuáticos y paseos en barco."
     }
   }
+  },
+  "weather": {
+    "title": "Clima en Isla Bella Hotel",
+    "loading": "Cargando clima...",
+    "error": "No se pudo cargar el clima"
   }
 
 }
