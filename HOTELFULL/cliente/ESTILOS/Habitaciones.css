@@ -312,19 +312,19 @@
   }
 
   @media (max-width: 1024px) {
-    .habitaciones-page {
+    /*.habitaciones-page {
       padding-top: 110px;
-    }
+    }*/
 
-    .page-header {
+    .hab-header {
       padding: 50px 20px;
     }
 
-    .page-header h1 {
+    .hab-header h1 {
       font-size: 3rem;
     }
 
-    .page-header p {
+    .hab-header p {
       font-size: 1.1rem;
     }
 
@@ -335,16 +335,16 @@
   }
 
   @media (max-width: 768px) {
-    .page-header {
+    .hab-header {
       padding: 40px 20px;
       margin-bottom: 40px;
     }
 
-    .page-header h1 {
+    .hab-header h1 {
       font-size: 2.5rem;
     }
 
-    .page-header p {
+    .hab-header p {
       font-size: 1rem;
     }
 
@@ -409,21 +409,21 @@
   }
 
   @media (max-width: 480px) {
-    .habitaciones-page {
+    /*.habitaciones-page {
       padding-top: 100px;
-    }
+    }*/
 
-    .page-header {
+    .hab-header {
       padding: 30px 15px;
       margin-bottom: 30px;
     }
 
-    .page-header h1 {
+    .hab-header h1 {
       font-size: 2rem;
       margin-bottom: 0.5rem;
     }
 
-    .page-header p {
+    .hab-header p {
       font-size: 0.9rem;
     }
 

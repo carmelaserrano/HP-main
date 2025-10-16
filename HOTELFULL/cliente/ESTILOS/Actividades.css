@@ -223,3 +223,162 @@
 .video-section:hover .video-video {
   transform: scale(1.05);
 }
+/* ======== RESPONSIVE ======== */
+
+/* --- Tablets grandes (hasta 1024px) --- */
+@media (max-width: 1024px) {
+  .actividades-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .actividades-header p {
+    font-size: 1.1rem;
+  }
+
+  .historia-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .sobre-historia-image img,
+  .video-section {
+    height: 350px;
+  }
+
+  .video-video {
+    width: 90%;
+    border-radius: 20px;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+  }
+
+  .services-grid2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .service-card h3 {
+    font-size: 1.3rem;
+  }
+}
+
+/* --- Tablets chicas y celulares grandes (hasta 768px) --- */
+@media (max-width: 768px) {
+  .actividades-page {
+    padding-top: 140px;
+  }
+
+  .actividades-header h1 {
+    font-size: 2rem;
+  }
+
+  .actividades-header p {
+    font-size: 1rem;
+  }
+
+  .historia-section {
+    padding: 40px 20px;
+  }
+
+  .historia-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .historia-text h2 {
+    font-size: 1.6rem;
+  }
+
+  .services-section {
+    padding: 40px 10px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .services-grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .service-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+
+  .service-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .act-lista {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .video-section {
+    height: 280px;
+  }
+
+  .video-video {
+    width: 95%;
+    border-radius: 15px;
+  }
+}
+
+/* --- Celulares chicos (hasta 480px) --- */
+@media (max-width: 480px) {
+  .actividades-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .actividades-header p {
+    font-size: 0.95rem;
+    padding: 0 10px;
+  }
+
+  .historia-section {
+    padding: 30px 15px;
+  }
+
+  .historia-text h2 {
+    font-size: 1.4rem;
+  }
+
+  .section-label {
+    font-size: 1rem;
+  }
+
+  .services-section h2 {
+    font-size: 1.4rem;
+  }
+
+  .services-grid,
+  .services-grid2 {
+    gap: 20px;
+  }
+
+  .service-icon {
+    font-size: 2.2rem;
+  }
+
+  .service-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .act-lista li {
+    font-size: 0.95rem;
+  }
+
+  .video-section {
+    height: 220px;
+  }
+
+  .video-video {
+    width: 100%;
+    border-radius: 10px;
+  }
+}
