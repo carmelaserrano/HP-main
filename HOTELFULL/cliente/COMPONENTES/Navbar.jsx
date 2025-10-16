@@ -2,11 +2,11 @@ import '../ESTILOS/Navbar.css'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-
+import { useState } from 'react'
 function Navbar() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-
+  const [menuOpen, setMenuOpen] = useState(false);
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
   };
@@ -36,8 +36,16 @@ function Navbar() {
             <img src="../recursos/LOGOS/logo1.png" alt="Isla bella" className="navbar-logo" />
           </div>
 
+          {/* Botón hamburguesa visible solo en mobile */}
+          <button
+            className="menu-toggle"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <i className="fas fa-bars"></i>
+          </button>
+
           {/* Links de navegación */}
-          <ul className="navbar-menu">
+          <ul className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
             <li><Link to="/">{t('navbar.home')}</Link></li>
             <li><Link to="/habitaciones">{t('navbar.rooms')}</Link></li>
             <li><Link to="/restaurantes">{t('navbar.restaurants')}</Link></li>
