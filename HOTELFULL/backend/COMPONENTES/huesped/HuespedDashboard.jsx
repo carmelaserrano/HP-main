@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx'
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../../../cliente/ESTILOS/Dashboard.css';
+import ModalReservaHabitacion from './ModalReservaHabitacion.jsx';
+import ModalReservaServicio from './ModalReservaServicio.jsx';
 
 function HuespedDashboard() {
+  const [showModalReservaHabitacion, setShowModalReservaHabitacion] = useState(false);
+  const [showModalReservaServicio, setShowModalReservaServicio] = useState(false);
+  const [habitacionSeleccionada, setHabitacionSeleccionada] = useState(null);
   const [user, setUser] = useState(null);
   const [reservas, setReservas] = useState([]);
+  const [reservasServicios, setReservasServicios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showReservationForm, setShowReservationForm] = useState(false);
-  const [reservationData, setReservationData] = useState(null);
-  const [formData, setFormData] = useState({
-    fechaEntrada: '',
-    fechaSalida: '',
-    numeroHuespedes: 1,
-    observaciones: ''
-  });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,15 +21,26 @@ function HuespedDashboard() {
 
     // Verificar si hay datos de reserva en el state o localStorage
     if (location.state?.reservationData) {
-      setReservationData(location.state.reservationData);
-      setShowReservationForm(true);
-      // Limpiar localStorage
+      const roomData = location.state.reservationData;
+      setHabitacionSeleccionada({
+        tipo: roomData.title,
+        precio_por_noche: parseFloat(roomData.price),
+        capacidad: parseInt(roomData.details.guests),
+        badge: roomData.badge
+      });
+      setShowModalReservaHabitacion(true);
       localStorage.removeItem('pendingReservation');
     } else {
       const pendingReservation = localStorage.getItem('pendingReservation');
       if (pendingReservation) {
-        setReservationData(JSON.parse(pendingReservation));
-        setShowReservationForm(true);
+        const roomData = JSON.parse(pendingReservation);
+        setHabitacionSeleccionada({
+          tipo: roomData.title,
+          precio_por_noche: parseFloat(roomData.price),
+          capacidad: parseInt(roomData.details.guests),
+          badge: roomData.badge
+        });
+        setShowModalReservaHabitacion(true);
         localStorage.removeItem('pendingReservation');
       }
     }
@@ -55,7 +64,7 @@ function HuespedDashboard() {
 
       setUser(profileData);
 
-      // Obtener reservas del usuario
+      // Obtener reservas de habitaciones del usuario
       const { data: reservasData } = await supabase
         .from('reservas')
         .select(`
@@ -66,108 +75,34 @@ function HuespedDashboard() {
         .order('created_at', { ascending: false });
 
       setReservas(reservasData || []);
+
+      // Obtener reservas de servicios
+      await loadServiciosReservados(session.user.id);
+
       setLoading(false);
     } catch (error) {
       console.error('Error:', error);
       setLoading(false);
+    }
+  };
+
+  const loadServiciosReservados = async (userId) => {
+    const { data, error } = await supabase
+      .from('reserva_servicio')
+      .select(`
+        *,
+        servicios_extras (nombre, precio)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error) {
+      setReservasServicios(data || []);
     }
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
-  };
-
-  const handleReservationSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.fechaEntrada || !formData.fechaSalida) {
-      alert('Por favor, completa las fechas de entrada y salida');
-      return;
-    }
-
-    // Validar que la fecha de salida sea posterior a la fecha de entrada
-    if (new Date(formData.fechaSalida) <= new Date(formData.fechaEntrada)) {
-      alert('La fecha de salida debe ser posterior a la fecha de entrada');
-      return;
-    }
-
-    try {
-      // Calcular número de noches
-      const entrada = new Date(formData.fechaEntrada);
-      const salida = new Date(formData.fechaSalida);
-      const noches = Math.ceil((salida - entrada) / (1000 * 60 * 60 * 24));
-      const precioPorNoche = parseFloat(reservationData.price);
-      const total = noches * precioPorNoche;
-
-      // Buscar la habitación en la base de datos por título
-      const { data: habitacionData, error: habitacionError } = await supabase
-        .from('habitaciones')
-        .select('id')
-        .eq('tipo', reservationData.title)
-        .single();
-
-      let habitacionId = habitacionData?.id;
-
-      // Si no existe la habitación, crearla
-      if (!habitacionId) {
-        const { data: nuevaHabitacion, error: crearError } = await supabase
-          .from('habitaciones')
-          .insert([{
-            numero: Math.floor(Math.random() * 900) + 100,
-            tipo: reservationData.title,
-            precio_por_noche: precioPorNoche,
-            capacidad: formData.numeroHuespedes,
-            estado: 'disponible'
-          }])
-          .select()
-          .single();
-
-        if (crearError) {
-          console.error('Error al crear habitación:', crearError);
-          alert('Error al procesar la habitación');
-          return;
-        }
-        habitacionId = nuevaHabitacion.id;
-      }
-
-      // Crear la reserva
-      const { data: nuevaReserva, error: reservaError } = await supabase
-        .from('reservas')
-        .insert([{
-          usuario_id: user.id,
-          habitacion_id: habitacionId,
-          fecha_entrada: formData.fechaEntrada,
-          fecha_salida: formData.fechaSalida,
-          numero_huespedes: formData.numeroHuespedes,
-          estado: 'pendiente',
-          total: total,
-          observaciones: formData.observaciones
-        }])
-        .select();
-
-      if (reservaError) {
-        console.error('Error al crear reserva:', reservaError);
-        alert('Error al crear la reserva: ' + reservaError.message);
-        return;
-      }
-
-      alert('¡Reserva creada exitosamente! Total: $' + total);
-      setShowReservationForm(false);
-      setReservationData(null);
-      setFormData({
-        fechaEntrada: '',
-        fechaSalida: '',
-        numeroHuespedes: 1,
-        observaciones: ''
-      });
-
-      // Recargar reservas
-      loadUserData();
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al procesar la reserva');
-    }
   };
 
   if (loading) {
@@ -189,13 +124,14 @@ function HuespedDashboard() {
       </div>
 
       <div className="dashboard-content">
+        {/* SECCIÓN: Reservas de Habitaciones */}
         <div className="dashboard-card">
-          <h2>📅 Mis Reservas</h2>
+          <h2>📅 Mis Reservas de Habitaciones</h2>
 
           {reservas.length === 0 ? (
             <div className="empty-state">
               <i className="fas fa-calendar-times"></i>
-              <p>No tienes reservas aún</p>
+              <p>No tienes reservas de habitaciones aún</p>
               <button
                 onClick={() => navigate('/rooms')}
                 className="btn-primary"
@@ -228,16 +164,44 @@ function HuespedDashboard() {
           )}
         </div>
 
+        {/* NUEVA SECCIÓN: Servicios Reservados */}
+        {reservasServicios.length > 0 && (
+          <div className="dashboard-card">
+            <h2>✨ Mis Servicios Reservados</h2>
+            <div className="reservas-list">
+              {reservasServicios.map((reserva) => (
+                <div key={reserva.id} className="reserva-card">
+                  <div className="reserva-header">
+                    <h3>{reserva.servicios_extras?.nombre || 'Servicio'}</h3>
+                    <span className="badge badge-pendiente">
+                      Reservado
+                    </span>
+                  </div>
+                  <div className="reserva-details">
+                    <p><i className="fas fa-calendar"></i> Fecha: {reserva.fecha_servicio || 'Por confirmar'}</p>
+                    <p><i className="fas fa-hashtag"></i> Cantidad: {reserva.cantidad}</p>
+                    <p><i className="fas fa-dollar-sign"></i> Precio unitario: ${reserva.precio_unitario}</p>
+                    <p className="reserva-total">
+                      <i className="fas fa-calculator"></i> Subtotal: ${reserva.subtotal}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECCIÓN: Acciones Rápidas */}
         <div className="dashboard-card">
           <h2>⚡ Acciones Rápidas</h2>
           <div className="quick-actions">
             <button onClick={() => navigate('/rooms')} className="action-btn">
-              <i className="fas fa-search"></i>
-              Ver Habitaciones
+              <i className="fas fa-bed"></i>
+              Reservar Habitación
             </button>
-            <button onClick={() => navigate('/servicios')} className="action-btn">
-              <i className="fas fa-concierge-bell"></i>
-              Servicios
+            <button onClick={() => setShowModalReservaServicio(true)} className="action-btn">
+              <i className="fas fa-spa"></i>
+              Reservar Servicios
             </button>
             <button onClick={() => navigate('/contacto')} className="action-btn">
               <i className="fas fa-phone"></i>
@@ -247,81 +211,21 @@ function HuespedDashboard() {
         </div>
       </div>
 
-      {/* Modal de Reserva */}
-      {showReservationForm && reservationData && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Reservar {reservationData.title}</h2>
+      {/* 🛏️ Modal Reserva Habitación */}
+      {showModalReservaHabitacion && (
+        <ModalReservaHabitacion
+          onClose={() => setShowModalReservaHabitacion(false)}
+          onSuccess={loadUserData}
+          habitacion={habitacionSeleccionada}
+        />
+      )}
 
-            <div style={{ marginBottom: '20px', padding: '15px', background: '#f8f9fa', borderRadius: '10px' }}>
-              <p><strong>Tipo:</strong> {reservationData.badge}</p>
-              <p><strong>Precio por noche:</strong> ${reservationData.price}</p>
-              <p><strong>Capacidad:</strong> {reservationData.details.guests}</p>
-              <p><strong>Tamaño:</strong> {reservationData.details.size}</p>
-            </div>
-
-            <form onSubmit={handleReservationSubmit}>
-              <div className="form-group">
-                <label>Fecha de Entrada</label>
-                <input
-                  type="date"
-                  value={formData.fechaEntrada}
-                  onChange={(e) => setFormData({...formData, fechaEntrada: e.target.value})}
-                  min={new Date().toISOString().split('T')[0]}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Fecha de Salida</label>
-                <input
-                  type="date"
-                  value={formData.fechaSalida}
-                  onChange={(e) => setFormData({...formData, fechaSalida: e.target.value})}
-                  min={formData.fechaEntrada || new Date().toISOString().split('T')[0]}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Número de Huéspedes</label>
-                <input
-                  type="number"
-                  value={formData.numeroHuespedes}
-                  onChange={(e) => setFormData({...formData, numeroHuespedes: parseInt(e.target.value)})}
-                  min="1"
-                  max="10"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Observaciones (opcional)</label>
-                <textarea
-                  value={formData.observaciones}
-                  onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
-                  placeholder="Solicitudes especiales, preferencias, etc."
-                />
-              </div>
-
-              <div className="modal-buttons">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => {
-                    setShowReservationForm(false);
-                    setReservationData(null);
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-primary">
-                  Confirmar Reserva
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* ✨ Modal Reserva Servicios */}
+      {showModalReservaServicio && (
+        <ModalReservaServicio
+          onClose={() => setShowModalReservaServicio(false)}
+          onSuccess={loadUserData}
+        />
       )}
     </div>
   );

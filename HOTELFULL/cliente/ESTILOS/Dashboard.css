@@ -849,3 +849,323 @@
   text-overflow: ellipsis;
   margin: 0;
 }
+/* ============================================
+   MODAL RESERVA HABITACIÓN
+   ============================================ */
+
+.habitacion-info-box {
+  background: linear-gradient(135deg, #faf8f3 0%, #f5f0e6 100%);
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.habitacion-info-box p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #19191a;
+}
+
+.habitacion-info-box strong {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #19191a;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: #d4af37;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Precio Total Box */
+.precio-total-box {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.precio-total-box h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.precio-total-box small {
+  font-size: 0.9rem;
+  opacity: 0.95;
+  display: block;
+}
+
+/* ============================================
+   MODAL RESERVA SERVICIOS
+   ============================================ */
+
+.servicios-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 15px;
+  background: #fafafa;
+  margin-top: 10px;
+}
+
+.servicio-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.servicio-item:last-child {
+  border-bottom: none;
+}
+
+.servicio-checkbox {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.servicio-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #d4af37;
+}
+
+.servicio-checkbox label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.servicio-checkbox label strong {
+  font-size: 1.1rem;
+  color: #19191a;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.servicio-checkbox label p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.servicio-precio {
+  display: inline-block;
+  background: #d4af37;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.servicio-cantidad {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 120px;
+}
+
+.servicio-cantidad label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.servicio-cantidad input {
+  width: 70px;
+  padding: 8px;
+  border: 2px solid #d4af37;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  justify-content: flex-end;
+}
+
+.btn-secondary,
+.btn-primary {
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-secondary {
+  background: #e0e0e0;
+  color: #19191a;
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================
+   GRÁFICO SIMPLE DE BARRAS
+   ============================================ */
+
+.simple-chart {
+  padding: 20px;
+}
+
+.chart-bar-group {
+  margin-bottom: 25px;
+}
+
+.chart-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #19191a;
+  margin-bottom: 10px;
+}
+
+.chart-bar-container {
+  background: #f5f5f5;
+  border-radius: 10px;
+  height: 45px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-bar {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.5s ease;
+  min-width: 50px;
+}
+
+.chart-bar.disponible {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.chart-bar.ocupada {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+}
+
+.chart-bar.operadores {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
+}
+
+/* Botones de acción adicionales */
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+
+.btn-success:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}

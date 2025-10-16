@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx'
+import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx';
 import { useNavigate } from 'react-router-dom';
 import '../../../cliente/ESTILOS/Dashboard.css';
 
@@ -9,19 +9,19 @@ function AdminDashboard() {
     totalHabitaciones: 0,
     habitacionesDisponibles: 0,
     habitacionesOcupadas: 0,
-    reservasActivas: 0,
-    totalUsuarios: 0,
-    totalRestaurantes: 0
+    totalOperadores: 0,
+    operadoresActivos: 0
   });
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [habitaciones, setHabitaciones] = useState([]);
-  const [reservas, setReservas] = useState([]);
-  const [restaurantes, setRestaurantes] = useState([]);
+  const [operadores, setOperadores] = useState([]);
 
   // Estados para modales
   const [showNuevaHabitacion, setShowNuevaHabitacion] = useState(false);
-  const [showNuevoRestaurante, setShowNuevoRestaurante] = useState(false);
+  const [showNuevoOperador, setShowNuevoOperador] = useState(false);
+  const [editingHabitacion, setEditingHabitacion] = useState(null);
+  const [editingOperador, setEditingOperador] = useState(null);
 
   const navigate = useNavigate();
 
@@ -46,13 +46,8 @@ function AdminDashboard() {
 
       setUser(profileData);
 
-      // Cargar estadísticas
-      await loadStats();
-
-      // Cargar datos completos
       await loadHabitaciones();
-      await loadReservas();
-      await loadRestaurantes();
+      await loadOperadores();
 
       setLoading(false);
     } catch (error) {
@@ -61,74 +56,92 @@ function AdminDashboard() {
     }
   };
 
-  const loadStats = async () => {
-    const { count: totalHab } = await supabase
-      .from('habitaciones')
-      .select('*', { count: 'exact', head: true });
-
-    const { count: habDisponibles } = await supabase
-      .from('habitaciones')
-      .select('*', { count: 'exact', head: true })
-      .eq('estado', 'disponible');
-
-    const { count: habOcupadas } = await supabase
-      .from('habitaciones')
-      .select('*', { count: 'exact', head: true })
-      .eq('estado', 'ocupada');
-
-    const { count: reservasActivas } = await supabase
-      .from('reservas')
-      .select('*', { count: 'exact', head: true })
-      .in('estado', ['pendiente', 'confirmada']);
-
-    const { count: totalUsuarios } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
-
-    const { count: totalRestaurantes } = await supabase
-      .from('restaurantes')
-      .select('*', { count: 'exact', head: true });
-
-    setStats({
-      totalHabitaciones: totalHab || 0,
-      habitacionesDisponibles: habDisponibles || 0,
-      habitacionesOcupadas: habOcupadas || 0,
-      reservasActivas: reservasActivas || 0,
-      totalUsuarios: totalUsuarios || 0,
-      totalRestaurantes: totalRestaurantes || 0
-    });
-  };
-
   const loadHabitaciones = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('habitaciones')
       .select('*')
       .order('numero', { ascending: true });
 
-    if (!error) setHabitaciones(data || []);
+    setHabitaciones(data || []);
+
+    const disponibles = data?.filter(h => h.estado === 'disponible').length || 0;
+    const ocupadas = data?.filter(h => h.estado === 'ocupada').length || 0;
+
+    setStats(prev => ({
+      ...prev,
+      totalHabitaciones: data?.length || 0,
+      habitacionesDisponibles: disponibles,
+      habitacionesOcupadas: ocupadas
+    }));
   };
 
-  const loadReservas = async () => {
+  const loadOperadores = async () => {
     const { data, error } = await supabase
-      .from('reservas')
-      .select(`
-        *,
-        habitaciones (numero, tipo),
-        profiles (nombre, apellido)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (!error) setReservas(data || []);
-  };
-
-  const loadRestaurantes = async () => {
-    const { data, error } = await supabase
-      .from('restaurantes')
+      .from('profiles')
       .select('*')
+      .eq('rol', 'operador')
       .order('nombre', { ascending: true });
 
-    if (!error) setRestaurantes(data || []);
+    if (error) {
+      console.error('Error al cargar operadores:', error);
+    }
+
+    setOperadores(data || []);
+
+    const activos = data?.filter(op => op.activo === true).length || 0;
+
+    setStats(prev => ({
+      ...prev,
+      totalOperadores: data?.length || 0,
+      operadoresActivos: activos
+    }));
+  };
+
+  const handleToggleHabitacion = async (id, currentEstado) => {
+    console.log('🔄 Toggle habitación:', { id, currentEstado });
+    // Cambiar entre 'disponible' y 'mantenimiento' (en vez de 'deshabilitada')
+    const nuevoEstado = currentEstado === 'disponible' ? 'mantenimiento' : 'disponible';
+    console.log('➡️ Nuevo estado:', nuevoEstado);
+
+    const { error, data } = await supabase
+      .from('habitaciones')
+      .update({ estado: nuevoEstado })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('❌ Error completo:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      alert('Error al cambiar estado: ' + error.message + '\nDetalles: ' + (error.details || error.hint || 'Sin más información'));
+    } else {
+      console.log('✅ Actualizado exitosamente:', data);
+      await loadHabitaciones();
+    }
+  };
+
+  const handleToggleOperador = async (id, currentActivo) => {
+    console.log('🔄 Toggle operador:', { id, currentActivo });
+    // Cambiar entre true (activo) y false (deshabilitado)
+    const nuevoActivo = !currentActivo;
+    console.log('➡️ Nuevo activo:', nuevoActivo);
+
+    const { error, data } = await supabase
+      .from('profiles')
+      .update({ activo: nuevoActivo })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('❌ Error al actualizar operador:', error);
+      alert('Error al cambiar estado del operador: ' + error.message);
+    } else {
+      console.log('✅ Operador actualizado:', data);
+      await loadOperadores();
+    }
   };
 
   const handleLogout = async () => {
@@ -164,33 +177,21 @@ function AdminDashboard() {
           📊 Dashboard
         </button>
         <button
+          className={activeSection === 'operadores' ? 'tab-active' : 'tab'}
+          onClick={() => setActiveSection('operadores')}
+        >
+          👥 Operadores
+        </button>
+        <button
           className={activeSection === 'habitaciones' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('habitaciones')}
         >
           🛏️ Habitaciones
         </button>
-        <button
-          className={activeSection === 'reservas' ? 'tab-active' : 'tab'}
-          onClick={() => setActiveSection('reservas')}
-        >
-          📅 Reservas
-        </button>
-        <button
-          className={activeSection === 'restaurantes' ? 'tab-active' : 'tab'}
-          onClick={() => setActiveSection('restaurantes')}
-        >
-          🍽️ Restaurantes
-        </button>
-        <button
-          className={activeSection === 'mapa' ? 'tab-active' : 'tab'}
-          onClick={() => setActiveSection('mapa')}
-        >
-          🗺️ Mapa de Ocupación
-        </button>
       </div>
 
       <div className="dashboard-content">
-        {/* DASHBOARD PRINCIPAL */}
+        {/* DASHBOARD PRINCIPAL CON GRÁFICO */}
         {activeSection === 'dashboard' && (
           <>
             {/* Statistics Grid */}
@@ -214,53 +215,118 @@ function AdminDashboard() {
               </div>
 
               <div className="stat-card">
-                <i className="fas fa-calendar-check"></i>
-                <h3>{stats.reservasActivas}</h3>
-                <p>Reservas Activas</p>
-              </div>
-
-              <div className="stat-card">
                 <i className="fas fa-users"></i>
-                <h3>{stats.totalUsuarios}</h3>
-                <p>Usuarios Totales</p>
+                <h3>{stats.totalOperadores}</h3>
+                <p>Total Operadores</p>
               </div>
 
               <div className="stat-card">
-                <i className="fas fa-utensils"></i>
-                <h3>{stats.totalRestaurantes}</h3>
-                <p>Restaurantes</p>
+                <i className="fas fa-user-check"></i>
+                <h3>{stats.operadoresActivos}</h3>
+                <p>Operadores Activos</p>
               </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Gráfico Simple de Barras */}
             <div className="dashboard-card">
-              <h2>⚡ Acciones Rápidas</h2>
-              <div className="admin-actions">
-                <button className="admin-btn" onClick={() => setActiveSection('habitaciones')}>
-                  <i className="fas fa-bed"></i>
-                  Gestionar Habitaciones
-                </button>
-                <button className="admin-btn" onClick={() => setActiveSection('reservas')}>
-                  <i className="fas fa-calendar-alt"></i>
-                  Ver Todas las Reservas
-                </button>
-                <button className="admin-btn" onClick={() => setActiveSection('restaurantes')}>
-                  <i className="fas fa-utensils"></i>
-                  Gestionar Restaurantes
-                </button>
-                <button className="admin-btn" onClick={() => setActiveSection('mapa')}>
-                  <i className="fas fa-map-marked-alt"></i>
-                  Mapa de Ocupación
-                </button>
+              <h2>📊 Gráfico de Ocupación</h2>
+              <div className="simple-chart">
+                <div className="chart-bar-group">
+                  <div className="chart-label">Disponibles</div>
+                  <div className="chart-bar-container">
+                    <div
+                      className="chart-bar disponible"
+                      style={{ width: `${(stats.habitacionesDisponibles / stats.totalHabitaciones * 100) || 0}%` }}
+                    >
+                      {stats.habitacionesDisponibles}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="chart-bar-group">
+                  <div className="chart-label">Ocupadas</div>
+                  <div className="chart-bar-container">
+                    <div
+                      className="chart-bar ocupada"
+                      style={{ width: `${(stats.habitacionesOcupadas / stats.totalHabitaciones * 100) || 0}%` }}
+                    >
+                      {stats.habitacionesOcupadas}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="chart-bar-group">
+                  <div className="chart-label">Operadores Activos</div>
+                  <div className="chart-bar-container">
+                    <div
+                      className="chart-bar operadores"
+                      style={{ width: `${(stats.operadoresActivos / (stats.totalOperadores || 1) * 100) || 0}%` }}
+                    >
+                      {stats.operadoresActivos}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </>
         )}
 
+        {/* SECCIÓN OPERADORES */}
+        {activeSection === 'operadores' && (
+          <div className="dashboard-card">
+            <div className="section-header">
+              <h2>👥 Gestión de Operadores</h2>
+              <button className="btn-primary" onClick={() => setShowNuevoOperador(true)}>
+                + Nuevo Operador
+              </button>
+            </div>
+
+            <div className="table-container">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {operadores.map(op => (
+                    <tr key={op.id}>
+                      <td><strong>{op.nombre}</strong></td>
+                      <td>{op.telefono || 'N/A'}</td>
+                      <td>
+                        <span className={`badge ${op.activo ? 'badge-confirmada' : 'badge-cancelada'}`}>
+                          {op.activo ? 'Activo' : 'Deshabilitado'}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className="btn-action"
+                          onClick={() => setEditingOperador(op)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className={op.activo ? "btn-danger" : "btn-success"}
+                          onClick={() => handleToggleOperador(op.id, op.activo)}
+                        >
+                          {op.activo ? 'Deshabilitar' : 'Habilitar'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* SECCIÓN HABITACIONES */}
         {activeSection === 'habitaciones' && (
           <div className="dashboard-card">
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+            <div className="section-header">
               <h2>🛏️ Gestión de Habitaciones</h2>
               <button className="btn-primary" onClick={() => setShowNuevaHabitacion(true)}>
                 + Nueva Habitación
@@ -274,7 +340,7 @@ function AdminDashboard() {
                     <th>Número</th>
                     <th>Tipo</th>
                     <th>Capacidad</th>
-                    <th>Precio</th>
+                    <th>Precio/Noche</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
@@ -287,139 +353,74 @@ function AdminDashboard() {
                       <td>{hab.capacidad} personas</td>
                       <td>${hab.precio_por_noche}/noche</td>
                       <td>
-                        <span className={`badge badge-${hab.estado === 'disponible' ? 'confirmada' : 'pendiente'}`}>
-                          {hab.estado}
+                        <span className={`badge ${hab.estado === 'disponible' ? 'badge-confirmada' : hab.estado === 'mantenimiento' ? 'badge-cancelada' : 'badge-pendiente'}`}>
+                          {hab.estado === 'mantenimiento' ? 'Deshabilitada' : hab.estado}
                         </span>
                       </td>
                       <td>
-                        <button className="btn-action">Editar</button>
+                        <button
+                          className="btn-action"
+                          onClick={() => setEditingHabitacion(hab)}
+                        >
+                          Editar
+                        </button>
+                        {(hab.estado === 'disponible' || hab.estado === 'mantenimiento') && (
+                          <button
+                            className={hab.estado === 'mantenimiento' ? "btn-success" : "btn-danger"}
+                            onClick={() => handleToggleHabitacion(hab.id, hab.estado)}
+                          >
+                            {hab.estado === 'mantenimiento' ? 'Habilitar' : 'Deshabilitar'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-        )}
-
-        {/* SECCIÓN RESERVAS */}
-        {activeSection === 'reservas' && (
-          <div className="dashboard-card">
-            <h2>📅 Todas las Reservas</h2>
-            <div className="table-container">
-              <table className="dashboard-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Habitación</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservas.map(reserva => (
-                    <tr key={reserva.id}>
-                      <td>#{reserva.id.substring(0, 8)}</td>
-                      <td>{reserva.profiles?.nombre} {reserva.profiles?.apellido}</td>
-                      <td>Hab. {reserva.habitaciones?.numero} - {reserva.habitaciones?.tipo}</td>
-                      <td>{new Date(reserva.fecha_inicio).toLocaleDateString()}</td>
-                      <td>{new Date(reserva.fecha_fin).toLocaleDateString()}</td>
-                      <td><strong>${reserva.precio_total}</strong></td>
-                      <td>
-                        <span className={`badge badge-${reserva.estado}`}>
-                          {reserva.estado}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* SECCIÓN RESTAURANTES */}
-        {activeSection === 'restaurantes' && (
-          <div className="dashboard-card">
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
-              <h2>🍽️ Gestión de Restaurantes</h2>
-              <button className="btn-primary" onClick={() => setShowNuevoRestaurante(true)}>
-                + Nuevo Restaurante
-              </button>
-            </div>
-
-            <div className="table-container">
-              <table className="dashboard-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Tipo de Cocina</th>
-                    <th>Capacidad</th>
-                    <th>Horario</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {restaurantes.map(rest => (
-                    <tr key={rest.id}>
-                      <td><strong>{rest.nombre}</strong></td>
-                      <td>{rest.tipo_cocina}</td>
-                      <td>{rest.capacidad} comensales</td>
-                      <td>{rest.horario_apertura} - {rest.horario_cierre}</td>
-                      <td>
-                        <button className="btn-action">Editar</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* MAPA DE OCUPACIÓN */}
-        {activeSection === 'mapa' && (
-          <div className="dashboard-card">
-            <h2>🗺️ Mapa de Ocupación de Habitaciones</h2>
-            <div className="ocupacion-grid">
-              {habitaciones.map(hab => (
-                <div
-                  key={hab.id}
-                  className={`habitacion-badge ${hab.estado === 'disponible' ? 'disponible' : 'ocupada'}`}
-                >
-                  <div className="hab-numero">{hab.numero}</div>
-                  <div className="hab-tipo">{hab.tipo}</div>
-                  <div className="hab-estado">{hab.estado}</div>
-                </div>
-              ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* Modal Nueva Habitación */}
+      {/* Modales */}
       {showNuevaHabitacion && (
-        <ModalNuevaHabitacion
+        <ModalHabitacion
           onClose={() => setShowNuevaHabitacion(false)}
           onSuccess={() => {
             setShowNuevaHabitacion(false);
             loadHabitaciones();
-            loadStats();
           }}
         />
       )}
 
-      {/* Modal Nuevo Restaurante */}
-      {showNuevoRestaurante && (
-        <ModalNuevoRestaurante
-          onClose={() => setShowNuevoRestaurante(false)}
+      {editingHabitacion && (
+        <ModalHabitacion
+          habitacion={editingHabitacion}
+          onClose={() => setEditingHabitacion(null)}
           onSuccess={() => {
-            setShowNuevoRestaurante(false);
-            loadRestaurantes();
-            loadStats();
+            setEditingHabitacion(null);
+            loadHabitaciones();
+          }}
+        />
+      )}
+
+      {showNuevoOperador && (
+        <ModalOperador
+          onClose={() => setShowNuevoOperador(false)}
+          onSuccess={() => {
+            setShowNuevoOperador(false);
+            loadOperadores();
+          }}
+        />
+      )}
+
+      {editingOperador && (
+        <ModalOperador
+          operador={editingOperador}
+          onClose={() => setEditingOperador(null)}
+          onSuccess={() => {
+            setEditingOperador(null);
+            loadOperadores();
           }}
         />
       )}
@@ -427,28 +428,24 @@ function AdminDashboard() {
   );
 }
 
-// Componente Modal para Nueva Habitación
-function ModalNuevaHabitacion({ onClose, onSuccess }) {
+// MODAL HABITACIÓN
+function ModalHabitacion({ onClose, onSuccess, habitacion }) {
   const [formData, setFormData] = useState({
-    numero: '',
-    tipo: 'Simple',
-    capacidad: 1,
-    precio_por_noche: '',
-    estado: 'disponible',
-    descripcion: '',
-    imagenes: []
+    numero: habitacion?.numero || '',
+    tipo: habitacion?.tipo || 'Simple',
+    capacidad: habitacion?.capacidad || 1,
+    precio_por_noche: habitacion?.precio_por_noche || '',
+    descripcion: habitacion?.descripcion || ''
   });
   const [imageFiles, setImageFiles] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // Manejar archivos seleccionados
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     handleFiles(files);
   };
 
-  // Manejar drag & drop
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -466,7 +463,6 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
     handleFiles(files);
   };
 
-  // Procesar archivos
   const handleFiles = (files) => {
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     if (imageFiles.length === 0) {
@@ -476,12 +472,10 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
     setImageFiles(prev => [...prev, ...imageFiles]);
   };
 
-  // Eliminar imagen
   const removeImage = (index) => {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Subir imágenes a Supabase Storage
   const uploadImages = async () => {
     const uploadedUrls = [];
 
@@ -499,7 +493,6 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
         continue;
       }
 
-      // Obtener URL pública
       const { data } = supabase.storage
         .from('imagenes')
         .getPublicUrl(filePath);
@@ -515,26 +508,35 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
     setUploading(true);
 
     try {
-      // Subir imágenes primero
-      const imageUrls = await uploadImages();
+      const imageUrls = imageFiles.length > 0 ? await uploadImages() : [];
+      const dataToSave = {
+        ...formData,
+        ...(imageUrls.length > 0 && { imagenes: imageUrls })
+      };
 
-      // Crear habitación con URLs de imágenes
-      const { error } = await supabase
-        .from('habitaciones')
-        .insert([{
-          ...formData,
-          imagenes: imageUrls
-        }]);
+      if (habitacion) {
+        // Editar
+        const { error } = await supabase
+          .from('habitaciones')
+          .update(dataToSave)
+          .eq('id', habitacion.id);
 
-      if (error) {
-        alert('Error al crear habitación: ' + error.message);
+        if (error) throw error;
+        alert('Habitación actualizada exitosamente!');
       } else {
+        // Crear
+        const { error } = await supabase
+          .from('habitaciones')
+          .insert([{ ...dataToSave, estado: 'disponible' }]);
+
+        if (error) throw error;
         alert('Habitación creada exitosamente!');
-        onSuccess();
       }
+
+      onSuccess();
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al crear la habitación');
+      alert('Error: ' + error.message);
     } finally {
       setUploading(false);
     }
@@ -543,7 +545,7 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>➕ Nueva Habitación</h2>
+        <h2>{habitacion ? '✏️ Editar Habitación' : '➕ Nueva Habitación'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Número de Habitación</label>
@@ -574,7 +576,6 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
               type="number"
               value={formData.capacidad}
               onChange={(e) => setFormData({...formData, capacidad: parseInt(e.target.value)})}
-              min="1"
               required
             />
           </div>
@@ -584,7 +585,7 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
             <input
               type="number"
               value={formData.precio_por_noche}
-              onChange={(e) => setFormData({...formData, precio_por_noche: e.target.value})}
+              onChange={(e) => setFormData({...formData, precio_por_noche: parseFloat(e.target.value)})}
               required
             />
           </div>
@@ -598,9 +599,8 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
             ></textarea>
           </div>
 
-          {/* Zona de Drag & Drop */}
           <div className="form-group">
-            <label>Imágenes de la Habitación</label>
+            <label>Imágenes</label>
             <div
               className={`image-upload-zone ${isDragging ? 'dragging' : ''}`}
               onDragOver={handleDragOver}
@@ -618,20 +618,15 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
               />
               <div className="upload-icon">📸</div>
               <p className="upload-text">
-                Arrastra imágenes aquí o haz clic para seleccionar
+                Arrastra imágenes aquí o haz clic
               </p>
-              <p className="upload-hint">Formatos: JPG, PNG, WEBP</p>
             </div>
 
-            {/* Preview de imágenes */}
             {imageFiles.length > 0 && (
               <div className="image-preview-grid">
                 {imageFiles.map((file, index) => (
                   <div key={index} className="image-preview-item">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Preview ${index + 1}`}
-                    />
+                    <img src={URL.createObjectURL(file)} alt={`Preview ${index + 1}`} />
                     <button
                       type="button"
                       className="remove-image-btn"
@@ -642,7 +637,6 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
                     >
                       ×
                     </button>
-                    <p className="image-name">{file.name}</p>
                   </div>
                 ))}
               </div>
@@ -654,7 +648,7 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={uploading}>
-              {uploading ? 'Subiendo...' : 'Crear Habitación'}
+              {uploading ? 'Guardando...' : habitacion ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
@@ -663,103 +657,149 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
   );
 }
 
-// Componente Modal para Nuevo Restaurante
-function ModalNuevoRestaurante({ onClose, onSuccess }) {
+// MODAL OPERADOR
+function ModalOperador({ onClose, onSuccess, operador }) {
   const [formData, setFormData] = useState({
-    nombre: '',
-    tipo_cocina: '',
-    capacidad: '',
-    horario_apertura: '08:00',
-    horario_cierre: '22:00',
-    descripcion: ''
+    nombre: operador?.nombre || '',
+    email: operador?.email || '',
+    telefono: operador?.telefono || '',
+    password: ''
   });
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const { error } = await supabase
-      .from('restaurantes')
-      .insert([formData]);
+    try {
+      if (operador) {
+        // Editar operador existente
+        const updateData = {
+          nombre: formData.nombre,
+          telefono: formData.telefono
+        };
 
-    if (error) {
-      alert('Error al crear restaurante: ' + error.message);
-    } else {
-      alert('Restaurante creado exitosamente!');
+        const { error } = await supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', operador.id);
+
+        if (error) throw error;
+        alert('Operador actualizado exitosamente!');
+      } else {
+        // Crear nuevo operador
+        if (!formData.password) {
+          alert('La contraseña es obligatoria para crear un operador');
+          setLoading(false);
+          return;
+        }
+
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              nombre: formData.nombre,
+              telefono: formData.telefono,
+              rol: 'operador'
+            }
+          }
+        });
+
+        if (authError) {
+          console.error('Error en signUp:', authError);
+          if (authError.message.includes('already registered') || authError.message.includes('already exists')) {
+            alert('Error: Este email ya está registrado. Por favor usa otro email.');
+          } else {
+            alert('Error al crear operador: ' + authError.message);
+          }
+          setLoading(false);
+          return;
+        }
+
+        if (authData.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert([{
+              id: authData.user.id,
+              nombre: formData.nombre,
+              telefono: formData.telefono,
+              rol: 'operador',
+              activo: true
+            }]);
+
+          if (profileError) {
+            console.error('Error al crear profile:', profileError);
+            throw profileError;
+          }
+        }
+
+        alert('Operador creado exitosamente!');
+      }
+
       onSuccess();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>➕ Nuevo Restaurante</h2>
+        <h2>{operador ? '✏️ Editar Operador' : '➕ Nuevo Operador'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Nombre</label>
+            <label>Nombre Completo</label>
             <input
               type="text"
               value={formData.nombre}
               onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+              placeholder="Nombre y Apellido"
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Tipo de Cocina</label>
+            <label>Email</label>
             <input
-              type="text"
-              value={formData.tipo_cocina}
-              onChange={(e) => setFormData({...formData, tipo_cocina: e.target.value})}
-              placeholder="Ej: Italiana, China, Parrilla"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              disabled={!!operador}
               required
             />
           </div>
 
           <div className="form-group">
-            <label>Capacidad</label>
+            <label>Teléfono</label>
             <input
-              type="number"
-              value={formData.capacidad}
-              onChange={(e) => setFormData({...formData, capacidad: parseInt(e.target.value)})}
-              required
+              type="tel"
+              value={formData.telefono}
+              onChange={(e) => setFormData({...formData, telefono: e.target.value})}
             />
           </div>
 
-          <div className="form-group">
-            <label>Horario de Apertura</label>
-            <input
-              type="time"
-              value={formData.horario_apertura}
-              onChange={(e) => setFormData({...formData, horario_apertura: e.target.value})}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Horario de Cierre</label>
-            <input
-              type="time"
-              value={formData.horario_cierre}
-              onChange={(e) => setFormData({...formData, horario_cierre: e.target.value})}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Descripción</label>
-            <textarea
-              value={formData.descripcion}
-              onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-              rows="3"
-            ></textarea>
-          </div>
+          {!operador && (
+            <div className="form-group">
+              <label>Contraseña</label>
+              <input
+                type="password"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                required
+              />
+            </div>
+          )}
 
           <div className="modal-buttons">
             <button type="button" onClick={onClose} className="btn-secondary">
               Cancelar
             </button>
-            <button type="submit" className="btn-primary">
-              Crear Restaurante
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Guardando...' : operador ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
