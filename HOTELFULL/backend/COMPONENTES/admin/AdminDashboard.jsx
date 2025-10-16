@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient.jsx'
+import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx'
 import { useNavigate } from 'react-router-dom';
 import '../../../cliente/ESTILOS/Dashboard.css';
 
@@ -285,7 +285,7 @@ function AdminDashboard() {
                       <td><strong>{hab.numero}</strong></td>
                       <td>{hab.tipo}</td>
                       <td>{hab.capacidad} personas</td>
-                      <td>${hab.precio}/noche</td>
+                      <td>${hab.precio_por_noche}/noche</td>
                       <td>
                         <span className={`badge badge-${hab.estado === 'disponible' ? 'confirmada' : 'pendiente'}`}>
                           {hab.estado}
@@ -433,23 +433,110 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
     numero: '',
     tipo: 'Simple',
     capacidad: 1,
-    precio: '',
+    precio_por_noche: '',
     estado: 'disponible',
-    descripcion: ''
+    descripcion: '',
+    imagenes: []
   });
+  const [imageFiles, setImageFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // Manejar archivos seleccionados
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    handleFiles(files);
+  };
+
+  // Manejar drag & drop
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
+  // Procesar archivos
+  const handleFiles = (files) => {
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      alert('Por favor selecciona solo archivos de imagen');
+      return;
+    }
+    setImageFiles(prev => [...prev, ...imageFiles]);
+  };
+
+  // Eliminar imagen
+  const removeImage = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Subir imágenes a Supabase Storage
+  const uploadImages = async () => {
+    const uploadedUrls = [];
+
+    for (const file of imageFiles) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `habitaciones/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('imagenes')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Error al subir imagen:', uploadError);
+        continue;
+      }
+
+      // Obtener URL pública
+      const { data } = supabase.storage
+        .from('imagenes')
+        .getPublicUrl(filePath);
+
+      uploadedUrls.push(data.publicUrl);
+    }
+
+    return uploadedUrls;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setUploading(true);
 
-    const { error } = await supabase
-      .from('habitaciones')
-      .insert([formData]);
+    try {
+      // Subir imágenes primero
+      const imageUrls = await uploadImages();
 
-    if (error) {
-      alert('Error al crear habitación: ' + error.message);
-    } else {
-      alert('Habitación creada exitosamente!');
-      onSuccess();
+      // Crear habitación con URLs de imágenes
+      const { error } = await supabase
+        .from('habitaciones')
+        .insert([{
+          ...formData,
+          imagenes: imageUrls
+        }]);
+
+      if (error) {
+        alert('Error al crear habitación: ' + error.message);
+      } else {
+        alert('Habitación creada exitosamente!');
+        onSuccess();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al crear la habitación');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -496,8 +583,8 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
             <label>Precio por Noche</label>
             <input
               type="number"
-              value={formData.precio}
-              onChange={(e) => setFormData({...formData, precio: e.target.value})}
+              value={formData.precio_por_noche}
+              onChange={(e) => setFormData({...formData, precio_por_noche: e.target.value})}
               required
             />
           </div>
@@ -511,12 +598,63 @@ function ModalNuevaHabitacion({ onClose, onSuccess }) {
             ></textarea>
           </div>
 
+          {/* Zona de Drag & Drop */}
+          <div className="form-group">
+            <label>Imágenes de la Habitación</label>
+            <div
+              className={`image-upload-zone ${isDragging ? 'dragging' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById('fileInput').click()}
+            >
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+              <div className="upload-icon">📸</div>
+              <p className="upload-text">
+                Arrastra imágenes aquí o haz clic para seleccionar
+              </p>
+              <p className="upload-hint">Formatos: JPG, PNG, WEBP</p>
+            </div>
+
+            {/* Preview de imágenes */}
+            {imageFiles.length > 0 && (
+              <div className="image-preview-grid">
+                {imageFiles.map((file, index) => (
+                  <div key={index} className="image-preview-item">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index + 1}`}
+                    />
+                    <button
+                      type="button"
+                      className="remove-image-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeImage(index);
+                      }}
+                    >
+                      ×
+                    </button>
+                    <p className="image-name">{file.name}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="modal-buttons">
             <button type="button" onClick={onClose} className="btn-secondary">
               Cancelar
             </button>
-            <button type="submit" className="btn-primary">
-              Crear Habitación
+            <button type="submit" className="btn-primary" disabled={uploading}>
+              {uploading ? 'Subiendo...' : 'Crear Habitación'}
             </button>
           </div>
         </form>

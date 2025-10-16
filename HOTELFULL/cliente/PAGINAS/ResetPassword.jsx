@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../backend/supabaseClient';
+import { supabase } from '../SERVICIOS/supabaseClient';
 import '../ESTILOS/ResetPassword.css';
 
 function ResetPassword() {

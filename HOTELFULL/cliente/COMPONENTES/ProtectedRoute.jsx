@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { supabase } from '../../backend/supabaseClient';
+import { supabase } from '../SERVICIOS/supabaseClient';
 
 function ProtectedRoute({ children, allowedRoles }) {
   const [loading, setLoading] = useState(true);

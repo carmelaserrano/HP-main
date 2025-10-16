@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../../backend/supabaseClient';
+import { supabase } from '../SERVICIOS/supabaseClient';
 import '../ESTILOS/RecuperarPassword.css';
 
 function RecuperarPassword() {

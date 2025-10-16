@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../backend/supabaseClient.jsx';
+import { supabase } from '../SERVICIOS/supabaseClient.jsx';
 
 function RoomCard({ images, title, description, badge, features, details, price, period }) {
   const [currentImage, setCurrentImage] = React.useState(0);

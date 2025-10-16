@@ -1,11 +1,168 @@
 import '../ESTILOS/Habitaciones.css'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import RoomCard from '../COMPONENTES/RoomCard';
 import PageTransition from '../COMPONENTES/PageTransition.jsx'
+import { supabase } from '../SERVICIOS/supabaseClient';
 
 function Habitaciones() {
   const { t } = useTranslation();
+  const [habitaciones, setHabitaciones] = useState([]);
+
+  // Mapeo de tipos de habitación a imágenes y badges
+  const roomImageMap = {
+    'Veranda King Suite': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/1dormitorio/d1a.jpeg',
+        '/recursos/IMAGENES/habitaciones/1dormitorio/d1b.jpeg',
+        '/recursos/IMAGENES/habitaciones/1dormitorio/d1c.jpeg',
+      ],
+      badge: t('habitaciones.oceanView'),
+      features: [
+        { icon: 'fa-water', text: t('habitaciones.view') },
+        { icon: 'fa-bed', text: t('habitaciones.kingBed') },
+        { icon: 'fa-tv', text: t('habitaciones.smartTv') },
+        { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
+        { icon: 'fa-bath', text: t('habitaciones.bath') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
+      ]
+    },
+    'Family Suite': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/2dormitorio/d2a.jpeg',
+        '/recursos/IMAGENES/habitaciones/2dormitorio/d2b.jpeg',
+        '/recursos/IMAGENES/habitaciones/2dormitorio/d2c.jpeg',
+        '/recursos/IMAGENES/habitaciones/2dormitorio/d2d.jpeg',
+        '/recursos/IMAGENES/habitaciones/2dormitorio/d2e.jpeg',
+      ],
+      badge: 'Apartment',
+      features: [
+        { icon: 'fa-users', text: t('habitaciones.2rooms') },
+        { icon: 'fa-blender', text: t('habitaciones.kitchen') },
+        { icon: 'fa-tv', text: t('habitaciones.tvs') },
+        { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
+        { icon: 'fa-bath', text: t('habitaciones.luxuryBath') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
+      ]
+    },
+    'Moon Suite': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/3dormitorio/d3a.jpeg',
+        '/recursos/IMAGENES/habitaciones/3dormitorio/d3b.jpeg',
+      ],
+      badge: 'Honeymoon',
+      features: [
+        { icon: 'fa-heart', text: t('habitaciones.romanticSetup') },
+        { icon: 'fa-bath', text: t('habitaciones.jacuzziPetals') },
+        { icon: 'fa-concierge-bell', text: t('habitaciones.roomService') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    },
+    'Green Suite': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/4dormitorio/d4a.jpeg',
+        '/recursos/IMAGENES/habitaciones/4dormitorio/d4b.jpeg',
+        '/recursos/IMAGENES/habitaciones/4dormitorio/d4c.jpeg',
+      ],
+      badge: 'Pool',
+      features: [
+        { icon: 'fa-seedling', text: t('habitaciones.jardin') },
+        { icon: 'fa-swimmer', text: t('habitaciones.pool') },
+        { icon: 'fa-gem', text: t('habitaciones.marmol') },
+        { icon: 'fa-bath', text: t('habitaciones.bath') },
+        { icon: 'fa-coffee', text: t('habitaciones.cafe') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    },
+    'Suite Presidencial': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/5presidencial/p1.jpeg',
+        '/recursos/IMAGENES/habitaciones/5presidencial/p2.jpeg',
+      ],
+      badge: 'VIP',
+      features: [
+        { icon: 'fa-crown', text: t('habitaciones.service') },
+        { icon: 'fa-bath', text: t('habitaciones.jacuzzi') },
+        { icon: 'fa-glass-cheers', text: t('habitaciones.bar') },
+        { icon: 'fa-sun', text: t('habitaciones.balcony') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    },
+    'Executive Suite': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/6dormitorio/d6a.jpeg',
+        '/recursos/IMAGENES/habitaciones/6dormitorio/d6b.jpeg',
+        '/recursos/IMAGENES/habitaciones/6dormitorio/d6c.jpeg',
+      ],
+      badge: 'Business',
+      features: [
+        { icon: 'fa-briefcase', text: t('habitaciones.desk') },
+        { icon: 'fa-coffee', text: t('habitaciones.cafe') },
+        { icon: 'fa-tv', text: t('habitaciones.smartTv') },
+        { icon: 'fa-bath', text: t('habitaciones.bath') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    },
+    'Simple': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/6dormitorio/d6a.jpeg',
+        '/recursos/IMAGENES/habitaciones/6dormitorio/d6b.jpeg',
+      ],
+      badge: 'Standard',
+      features: [
+        { icon: 'fa-bed', text: t('habitaciones.kingBed') },
+        { icon: 'fa-tv', text: t('habitaciones.smartTv') },
+        { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
+        { icon: 'fa-bath', text: t('habitaciones.bath') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    },
+    'Doble': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/1dormitorio/d1a.jpeg',
+        '/recursos/IMAGENES/habitaciones/1dormitorio/d1b.jpeg',
+      ],
+      badge: 'Standard',
+      features: [
+        { icon: 'fa-bed', text: t('habitaciones.kingBed') },
+        { icon: 'fa-tv', text: t('habitaciones.smartTv') },
+        { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
+        { icon: 'fa-bath', text: t('habitaciones.bath') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    },
+    'Suite': {
+      images: [
+        '/recursos/IMAGENES/habitaciones/3dormitorio/d3a.jpeg',
+        '/recursos/IMAGENES/habitaciones/3dormitorio/d3b.jpeg',
+      ],
+      badge: 'Luxury',
+      features: [
+        { icon: 'fa-bed', text: t('habitaciones.kingBed') },
+        { icon: 'fa-tv', text: t('habitaciones.smartTv') },
+        { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
+        { icon: 'fa-bath', text: t('habitaciones.bath') },
+        { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
+      ]
+    }
+  };
+
+  useEffect(() => {
+    cargarHabitaciones();
+  }, []);
+
+  const cargarHabitaciones = async () => {
+    const { data, error } = await supabase
+      .from('habitaciones')
+      .select('*')
+      .eq('estado', 'disponible');
+
+    if (error) {
+      console.error('Error al cargar habitaciones:', error);
+    } else {
+      setHabitaciones(data || []);
+    }
+  };
 
   return (
     <PageTransition>
@@ -17,142 +174,30 @@ function Habitaciones() {
 
       <div className="container">
         <div className="rooms-grid">
-          {/* habitación1 */}
-          <RoomCard
-            images={[
-              '/recursos/IMAGENES/habitaciones/1dormitorio/d1a.jpeg',
-              '/recursos/IMAGENES/habitaciones/1dormitorio/d1b.jpeg',
-              '/recursos/IMAGENES/habitaciones/1dormitorio/d1c.jpeg',
-            ]}
-            title={t('habitaciones.verandaKing')}
-            description={t('habitaciones.desc1')}
-            badge={t('habitaciones.oceanView')}
-            features={[
-              { icon: 'fa-water', text: t('habitaciones.view') },
-              { icon: 'fa-bed', text: t('habitaciones.kingBed') },
-              { icon: 'fa-tv', text: t('habitaciones.smartTv') },
-              { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
-              { icon: 'fa-bath', text: t('habitaciones.bath') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
-            ]}
-            details={{ guests: `2/3 ${t('habitaciones.guests')}`, size: '60 m²' }}
-            price="$250"
-            period={t('habitaciones.perNight')}
-          />
-          {/* habitación2 */}
-          <RoomCard
-            images={[
-              '/recursos/IMAGENES/habitaciones/2dormitorio/d2a.jpeg',
-              '/recursos/IMAGENES/habitaciones/2dormitorio/d2b.jpeg',
-              '/recursos/IMAGENES/habitaciones/2dormitorio/d2c.jpeg',
-              '/recursos/IMAGENES/habitaciones/2dormitorio/d2d.jpeg',
-              '/recursos/IMAGENES/habitaciones/2dormitorio/d2e.jpeg',
-              
-            ]}
-            title="Family Suite"
-            description={t('habitaciones.desc2')}
-            badge="Apartment"
-            features={[
-              { icon: 'fa-users', text: t('habitaciones.2rooms') },
-              { icon: 'fa-blender', text: t('habitaciones.kitchen') },
-              { icon: 'fa-tv', text: t('habitaciones.tvs') },
-              { icon: 'fa-wind', text: t('habitaciones.airConditioning') },
-              { icon: 'fa-bath', text: t('habitaciones.luxuryBath') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') },
-            ]}
-            details={{ guests: `2  ${t('habitaciones.adultos')} y 2 ${t('habitaciones.niños')}`, size: '100 m²' }}
-            price="$410"
-            period={t('habitaciones.perNight')}
-          />
+          {habitaciones.map((habitacion) => {
+            // Si la habitación tiene imágenes propias, usarlas; si no, usar del mapeo
+            const roomConfig = roomImageMap[habitacion.tipo] || roomImageMap['Simple'];
+            const imagesToShow = habitacion.imagenes && habitacion.imagenes.length > 0
+              ? habitacion.imagenes
+              : roomConfig.images;
 
-          {/*habitación3  Suite Romántica */}
-          <RoomCard
-            images={[
-              '/recursos/IMAGENES/habitaciones/3dormitorio/d3a.jpeg',
-              '/recursos/IMAGENES/habitaciones/3dormitorio/d3b.jpeg',
-            ]}
-            title="Moon Suite"
-            description={t('habitaciones.desc3')}
-            badge="Honeymoon"
-            features={[
-              { icon: 'fa-heart', text: t('habitaciones.romanticSetup') },
-              { icon: 'fa-bath', text: t('habitaciones.jacuzziPetals') },
-              { icon: 'fa-concierge-bell', text: t('habitaciones.roomService') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
-            ]}
-            details={{ guests: `2 ${t('habitaciones.guests')}`, size: '45 m²' }}
-            price="$190"
-            period={t('habitaciones.perNight')}
-          />
-          
-          {/*habitación4  Suite Jardín Moderno */}
-          <RoomCard
-            images={[
-              '/recursos/IMAGENES/habitaciones/4dormitorio/d4a.jpeg',
-              '/recursos/IMAGENES/habitaciones/4dormitorio/d4b.jpeg',
-              '/recursos/IMAGENES/habitaciones/4dormitorio/d4c.jpeg',
-            ]}
-            title="Green Suite"
-            description={t('habitaciones.desc4')}
-            badge="Pool"
-            features={[
-              { icon: 'fa-seedling', text: t('habitaciones.jardin') },
-              { icon: 'fa-swimmer', text: t('habitaciones.pool') },
-              { icon: 'fa-gem', text: t('habitaciones.marmol') },
-              { icon: 'fa-bath', text: t('habitaciones.bath') },
-              { icon: 'fa-coffee', text: t('habitaciones.cafe') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
-            ]}
-            details={{ guests: `2 ${t('habitaciones.guests')}`, size: '70 m²' }}
-            price="$250"
-            period={t('habitaciones.perNight')}
-          />
-          
-          {/*habitación5 */}
-            <RoomCard
-            images={[
-              '/recursos/IMAGENES/habitaciones/5presidencial/p1.jpeg',
-              '/recursos/IMAGENES/habitaciones/5presidencial/p2.jpeg',
-              
-            ]}
-            title="Suite Presidencial"
-            description={t('habitaciones.desc5')}
-            badge="VIP"
-            features={[
-              { icon: 'fa-crown', text: t('habitaciones.service') },
-              { icon: 'fa-bath', text: t('habitaciones.jacuzzi') },
-              { icon: 'fa-glass-cheers', text: t('habitaciones.bar') },
-              { icon: 'fa-sun', text: t('habitaciones.balcony') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
-            ]}
-            details={{ guests: `2 ${t('habitaciones.guests')}`, size: '60 m²' }}
-            price="$250"
-            period={t('habitaciones.perNight')}
-          />
-
-          {/* 6️6 Habitación Ejecutiva */}
-          <RoomCard
-            images={[
-              '/recursos/IMAGENES/habitaciones/6dormitorio/d6a.jpeg',
-              '/recursos/IMAGENES/habitaciones/6dormitorio/d6b.jpeg',
-              '/recursos/IMAGENES/habitaciones/6dormitorio/d6c.jpeg',
-            ]}
-            title="Executive Suite"
-            description={t('habitaciones.desc6')}
-            badge="Business"
-            features={[
-              { icon: 'fa-briefcase', text: t('habitaciones.desk') },
-              { icon: 'fa-coffee', text: t('habitaciones.cafe') },
-              { icon: 'fa-tv', text: t('habitaciones.smartTv') },
-              { icon: 'fa-bath', text: t('habitaciones.bath') },
-              { icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi')},
-            ]}
-            details={{ guests: `1/2 ${t('habitaciones.guests')}`, size: '40 m²' }}
-            price="$90"
-            period={t('habitaciones.perNight')}
-          />
-
-          
+            return (
+              <RoomCard
+                key={habitacion.id}
+                images={imagesToShow}
+                title={habitacion.tipo}
+                description={habitacion.descripcion}
+                badge={roomConfig.badge}
+                features={roomConfig.features}
+                details={{
+                  guests: `${habitacion.capacidad} ${t('habitaciones.guests')}`,
+                  size: '60 m²'
+                }}
+                price={`$${habitacion.precio_por_noche}`}
+                period={t('habitaciones.perNight')}
+              />
+            );
+          })}
         </div>
       </div>
 
