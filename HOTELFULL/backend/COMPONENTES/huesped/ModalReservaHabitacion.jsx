@@ -107,7 +107,18 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
         throw error;
       }
 
-      alert('¡Reserva creada exitosamente!');
+      // Actualizar estado de la habitación a 'ocupada'
+      const { error: habitacionError } = await supabase
+        .from('habitaciones')
+        .update({ estado: 'ocupada' })
+        .eq('id', habitacionData.id);
+
+      if (habitacionError) {
+        console.error('Error al actualizar habitación:', habitacionError);
+        // No bloqueamos la reserva si falla esto
+      }
+
+      alert('¡Reserva creada exitosamente! La habitación ha sido marcada como ocupada.');
       onSuccess();
       
     } catch (error) {

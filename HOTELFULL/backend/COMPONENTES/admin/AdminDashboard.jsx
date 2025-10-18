@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx';
 import { useNavigate } from 'react-router-dom';
 import '../../../cliente/ESTILOS/Dashboard.css';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 
 function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -159,10 +160,13 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container admin-dashboard">
+      {/* Background overlay */}
+      <div className="admin-bg-overlay"></div>
+
       {/* Header */}
-      <div className="dashboard-header">
-        <h1>Panel de Administrador - {user?.nombre}</h1>
+      <div className="dashboard-header admin-header">
+        <h1>👑 Panel de Administrador - {user?.nombre}</h1>
         <button onClick={handleLogout} className="btn-logout">
           Cerrar Sesión
         </button>
@@ -227,45 +231,34 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* Gráfico Simple de Barras */}
-            <div className="dashboard-card">
-              <h2>Gráfico de Ocupación</h2>
-              <div className="simple-chart">
-                <div className="chart-bar-group">
-                  <div className="chart-label">Disponibles</div>
-                  <div className="chart-bar-container">
-                    <div
-                      className="chart-bar disponible"
-                      style={{ width: `${(stats.habitacionesDisponibles / stats.totalHabitaciones * 100) || 0}%` }}
+            {/* Gráfico de Torta con Recharts */}
+            <div className="dashboard-card chart-card">
+              <h2>📊 Estado de Habitaciones</h2>
+              <div className="pie-chart-simple">
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Disponibles', value: stats.habitacionesDisponibles },
+                        { name: 'Ocupadas', value: stats.habitacionesOcupadas },
+                        { name: 'Mantenimiento', value: stats.totalHabitaciones - stats.habitacionesDisponibles - stats.habitacionesOcupadas }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
                     >
-                      {stats.habitacionesDisponibles}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="chart-bar-group">
-                  <div className="chart-label">Ocupadas</div>
-                  <div className="chart-bar-container">
-                    <div
-                      className="chart-bar ocupada"
-                      style={{ width: `${(stats.habitacionesOcupadas / stats.totalHabitaciones * 100) || 0}%` }}
-                    >
-                      {stats.habitacionesOcupadas}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="chart-bar-group">
-                  <div className="chart-label">Operadores Activos</div>
-                  <div className="chart-bar-container">
-                    <div
-                      className="chart-bar operadores"
-                      style={{ width: `${(stats.operadoresActivos / (stats.totalOperadores || 1) * 100) || 0}%` }}
-                    >
-                      {stats.operadoresActivos}
-                    </div>
-                  </div>
-                </div>
+                      <Cell fill="#28a745" />
+                      <Cell fill="#dc3545" />
+                      <Cell fill="#ffc107" />
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </>
