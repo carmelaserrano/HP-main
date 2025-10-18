@@ -306,6 +306,24 @@
     "title": "Clima en Isla Bella Hotel",
     "loading": "Cargando clima...",
     "error": "No se pudo cargar el clima"
+  },
+  "login": {
+    "campos": "Por favor, completa todos los campos",
+    "incorrecto": "Contraseña o usuario incorrecto. Por favor, intenta de nuevo.",
+    "info": "Error al obtener información del usuario",
+    "error": "Ocurrió un error inesperado. Por favor, intenta de nuevo.",
+    "title": "Bienvenido",
+    "sesion": "Inicia sesión para continuar",
+    "mail": " Correo Electrónico",
+    "contraseña": "Contraseña",
+    "recordarme": "Recordarme",
+    "olvidar": "¿Olvidaste tu contraseña?",
+    "iniciar": "Iniciando sesión...",
+    "registro": "¿No tienes una cuenta?",
+    "registar": "Regístrate",
+    "iniciarSesion": "Iniciar Sesión",
+    "button": "Volver al Inicio",
+    "placeholder1": "tu@email.com",
+    "placeholder2": "Ingresa tu contraseña"
   }
-
 }

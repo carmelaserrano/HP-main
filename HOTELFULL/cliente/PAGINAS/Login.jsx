@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../SERVICIOS/supabaseClient';
 import '../ESTILOS/Login.css';
 import PageTransition from '../COMPONENTES/PageTransition.jsx'
+import { useTranslation } from 'react-i18next'
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ function Login() {
     try {
       // Validación básica
       if (!email || !password) {
-        setError('Por favor, completa todos los campos');
+        setError(t('login.campos'));
         setLoading(false);
         return;
       }
@@ -32,7 +34,7 @@ function Login() {
       });
 
       if (signInError) {
-        setError('Contraseña o usuario incorrecto. Por favor, intenta de nuevo.');
+        setError(t('login.incorrecto'));
         setLoading(false);
         return;
       }
@@ -45,7 +47,7 @@ function Login() {
         .single();
 
       if (userError) {
-        setError('Error al obtener información del usuario');
+        setError(t('login.info'));
         setLoading(false);
         return;
       }
@@ -71,7 +73,7 @@ function Login() {
         navigate('/');
       }
     } catch (err) {
-      setError('Ocurrió un error inesperado. Por favor, intenta de nuevo.');
+      setError(t('login.error'));
       console.error('Error de login:', err);
     } finally {
       setLoading(false);
@@ -87,12 +89,12 @@ function Login() {
           className="btn-back"
           type="button"
         >
-          ← Volver al inicio
+          ← {t('login.button')}
         </button>
 
         <div className="login-header">
-          <h1>Bienvenido</h1>
-          <p>Inicia sesión para continuar</p>
+          <h1>{t('login.title')}</h1>
+          <p>{t('login.sesion')}</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -104,13 +106,13 @@ function Login() {
           )}
 
           <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
+            <label htmlFor="email">{t('login.mail')}</label>
             <div className="input-wrapper">
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder=" tu@email.com"
+                placeholder={t('login.placeholder1')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
@@ -120,13 +122,13 @@ function Login() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
+            <label htmlFor="password">{t('login.contraseña')}</label>
             <div className="input-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
-                placeholder="Ingresa tu contraseña"
+                placeholder={t('login.placeholder2',)}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
@@ -146,10 +148,10 @@ function Login() {
           <div className="form-options">
             <label className="remember-me">
               <input type="checkbox" />
-              <span>Recordarme</span>
+              <span>{t('login.recordarme')}</span>
             </label>
             <Link to="/recuperar-password" className="forgot-password">
-              ¿Olvidaste tu contraseña?
+              {t('login.olvidar')}
             </Link>
           </div>
 
@@ -157,15 +159,15 @@ function Login() {
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Iniciando sesión...
+                {t('login.iniciar')}
               </>
             ) : (
-              'Iniciar Sesión'
+              t('login.iniciarSesion')
             )}
           </button>
 
           <div className="register-link">
-            ¿No tienes cuenta? <a href="/registro">Regístrate aquí</a>
+            {t('login.registro')} <a href="/registro">{t('login.registar')}</a>
           </div>
         </form>
       </div>

@@ -306,6 +306,25 @@
   "title": "Weather at Isla Bella Hotel",
   "loading": "Loading weather...",
   "error": "Unable to load weather"
+},
+  "login": {
+  "campos": "Please fill in all fields",
+  "incorrecto": "Incorrect username or password. Please try again.",
+  "info": "Error retrieving user information",
+  "error": "An unexpected error occurred. Please try again.",
+  "title": "Welcome",
+  "sesion": "Log in to continue",
+  "mail": "Email Address",
+  "contraseña": "Password",
+  "recordarme": "Remember me",
+  "olvidar": "Forgot your password?",
+  "iniciar": "Logging in...",
+  "registro": "Don't have an account?",
+  "registar": "Sign up",
+  "iniciarSesion": "Log In",
+  "button": "Back to Home",
+  "placeholder1": "your@email.com",
+  "placeholder2": "Enter your password"
 }
 
 }
