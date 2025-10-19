@@ -2,14 +2,47 @@ import '../ESTILOS/Navbar.css'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../SERVICIOS/supabaseClient'
+import UserMenu from './UserMenu'
+
 function Navbar() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
   };
+
+  // Verificar si hay un usuario autenticado
+  useEffect(() => {
+    // Obtener usuario actual
+    const checkUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log('🔍 Usuario detectado en Navbar:', user);
+        setUser(user);
+      } catch (error) {
+        console.error('❌ Error al verificar usuario:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+
+    // Suscribirse a cambios de autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('🔄 Cambio de autenticación:', session?.user);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   return (
     <>
       {/* Top bar con información de contacto */}
@@ -23,8 +56,14 @@ function Navbar() {
             <a href="https://www.facebook.com/IslaBellaBeachResort/"><i className="fab fa-facebook-f"></i></a>
             <a href="https://www.instagram.com/islabellabeachresort/?hl=es"><i className="fab fa-instagram"></i></a>
           </div>
-          {/*<button className="btn-cta-secondary">{t('navbar.bookNow')}</button>*/}
-          <button className="btn-booking-top" onClick={() => navigate('/login')}>LOGIN</button>
+          {/* Mostrar UserMenu si hay usuario autenticado, sino mostrar LOGIN */}
+          {loading ? (
+            <button className="btn-booking-top" disabled>...</button>
+          ) : user ? (
+            <UserMenu />
+          ) : (
+            <button className="btn-booking-top" onClick={() => navigate('/login')}>LOGIN</button>
+          )}
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import '../ESTILOS/Weather.css'
+import './Weather.css'
 import { useTranslation } from 'react-i18next'
 
 export default function Weather() {
