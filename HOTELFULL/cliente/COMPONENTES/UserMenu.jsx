@@ -118,20 +118,24 @@ function UserMenu() {
           </div>
 
           {/* Botones de acción */}
-          <button className="dropdown-item" onClick={handleNavigation}>
-            {isInDashboard ? (
-              <>
-                <i className="fas fa-home"></i>
-                <span>Volver al Inicio</span>
-              </>
-            ) : (
-              <>
-                <i className="fas fa-tachometer-alt"></i>
-                <span>Ir a Dashboard</span>
-              </>
-            )}
-          </button>
+          {/* Solo huéspedes pueden navegar entre dashboard e inicio */}
+          {userData.rol === 'huesped' && (
+            <button className="dropdown-item" onClick={handleNavigation}>
+              {isInDashboard ? (
+                <>
+                  <i className="fas fa-home"></i>
+                  <span>Volver al Inicio</span>
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-tachometer-alt"></i>
+                  <span>Ir a Dashboard</span>
+                </>
+              )}
+            </button>
+          )}
 
+          {/* Todos pueden cerrar sesión */}
           <button className="dropdown-item logout-btn" onClick={handleLogout}>
             <i className="fas fa-sign-out-alt"></i>
             <span>Cerrar Sesión</span>

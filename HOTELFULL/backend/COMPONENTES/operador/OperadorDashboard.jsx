@@ -63,7 +63,7 @@ function OperadorDashboard() {
       .from('reservas')
       .select('*, habitaciones(numero, tipo)')
       .in('estado', ['pendiente', 'confirmada'])
-      .order('fecha_inicio', { ascending: true });
+      .order('fecha_entrada', { ascending: true });
 
     if (!error) {
       setReservas(data || []);
@@ -200,14 +200,14 @@ function OperadorDashboard() {
                 <tbody>
                   {reservas.map(reserva => (
                     <tr key={reserva.id}>
-                      <td>#{reserva.id.substring(0, 8)}</td>
+                      <td>#{String(reserva.id).substring(0, 8)}</td>
                       <td>
                         <strong>Hab. {reserva.habitaciones?.numero}</strong>
                         <br />
                         <small>{reserva.habitaciones?.tipo}</small>
                       </td>
-                      <td>{new Date(reserva.fecha_inicio).toLocaleDateString()}</td>
-                      <td>{new Date(reserva.fecha_fin).toLocaleDateString()}</td>
+                      <td>{new Date(reserva.fecha_entrada).toLocaleDateString()}</td>
+                      <td>{new Date(reserva.fecha_salida).toLocaleDateString()}</td>
                       <td>{reserva.numero_huespedes} personas</td>
                       <td>
                         <span className={`badge badge-${reserva.estado}`}>
@@ -240,7 +240,7 @@ function OperadorDashboard() {
         {/* PROCESAR PAGOS */}
         {activeSection === 'pagos' && (
           <div className="dashboard-card">
-            <h2>💰 Procesar Pagos de Reservas</h2>
+            <h2>Procesar Pagos de Reservas</h2>
             <div className="table-container">
               <table className="dashboard-table">
                 <thead>
@@ -256,14 +256,14 @@ function OperadorDashboard() {
                 <tbody>
                   {reservas.filter(r => r.estado === 'pendiente').map(reserva => (
                     <tr key={reserva.id}>
-                      <td>#{reserva.id.substring(0, 8)}</td>
+                      <td>#{String(reserva.id).substring(0, 8)}</td>
                       <td>
                         <strong>Hab. {reserva.habitaciones?.numero}</strong>
                         <br />
                         <small>{reserva.habitaciones?.tipo}</small>
                       </td>
                       <td>
-                        {new Date(reserva.fecha_inicio).toLocaleDateString()} - {new Date(reserva.fecha_fin).toLocaleDateString()}
+                        {new Date(reserva.fecha_entrada).toLocaleDateString()} - {new Date(reserva.fecha_salida).toLocaleDateString()}
                       </td>
                       <td><strong>${reserva.precio_total}</strong></td>
                       <td>
@@ -356,10 +356,10 @@ function ModalProcesarPago({ reserva, onClose, onSuccess }) {
         <h2>💰 Procesar Pago</h2>
 
         <div style={{ background: '#f5f5f5', padding: '20px', borderRadius: '10px', marginBottom: '20px' }}>
-          <p><strong>Reserva:</strong> #{reserva.id.substring(0, 8)}</p>
+          <p><strong>Reserva:</strong> #{String(reserva.id).substring(0, 8)}</p>
           <p><strong>Habitación:</strong> {reserva.habitaciones?.numero} - {reserva.habitaciones?.tipo}</p>
-          <p><strong>Check-in:</strong> {new Date(reserva.fecha_inicio).toLocaleDateString()}</p>
-          <p><strong>Check-out:</strong> {new Date(reserva.fecha_fin).toLocaleDateString()}</p>
+          <p><strong>Check-in:</strong> {new Date(reserva.fecha_entrada).toLocaleDateString()}</p>
+          <p><strong>Check-out:</strong> {new Date(reserva.fecha_salida).toLocaleDateString()}</p>
           <p style={{ fontSize: '1.3rem', marginTop: '15px' }}>
             <strong>Total a cobrar: ${reserva.precio_total}</strong>
           </p>
