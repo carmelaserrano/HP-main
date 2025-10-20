@@ -50,10 +50,22 @@ function OperadorDashboard() {
   };
 
   const loadHabitaciones = async () => {
-    const { data } = await supabase
+    console.log('🔄 Cargando habitaciones...');
+    const { data, error } = await supabase
       .from('habitaciones')
       .select('*')
       .order('numero', { ascending: true });
+
+    if (error) {
+      console.error('❌ Error al cargar habitaciones:', error);
+    } else {
+      console.log('✅ Habitaciones cargadas:', data);
+      // Mostrar específicamente la habitación 301
+      const hab301 = data.find(h => h.numero === '301' || h.numero === 301);
+      if (hab301) {
+        console.log('🏠 Estado de habitación 301:', hab301);
+      }
+    }
 
     setHabitaciones(data || []);
   };
@@ -76,12 +88,21 @@ function OperadorDashboard() {
     if (!confirm('¿Estás seguro de liberar esta reserva?')) return;
 
     try {
+      console.log('🔄 Iniciando liberación de reserva:', reservaId);
+
       // Primero obtenemos la reserva para saber qué habitación liberar
-      const { data: reservaData } = await supabase
+      const { data: reservaData, error: fetchError } = await supabase
         .from('reservas')
         .select('habitacion_id')
         .eq('id', reservaId)
         .single();
+
+      if (fetchError) {
+        console.error('❌ Error al obtener reserva:', fetchError);
+        throw fetchError;
+      }
+
+      console.log('📋 Datos de reserva obtenidos:', reservaData);
 
       // Cancelar la reserva
       const { error: reservaError } = await supabase
@@ -89,24 +110,38 @@ function OperadorDashboard() {
         .update({ estado: 'cancelada' })
         .eq('id', reservaId);
 
-      if (reservaError) throw reservaError;
+      if (reservaError) {
+        console.error('❌ Error al cancelar reserva:', reservaError);
+        throw reservaError;
+      }
+
+      console.log('✅ Reserva cancelada exitosamente');
 
       // Liberar la habitación (volver a disponible)
       if (reservaData?.habitacion_id) {
-        const { error: habitacionError } = await supabase
+        console.log('🏠 Intentando liberar habitación ID:', reservaData.habitacion_id);
+
+        const { error: habitacionError, data: habitacionData } = await supabase
           .from('habitaciones')
           .update({ estado: 'disponible' })
-          .eq('id', reservaData.habitacion_id);
+          .eq('id', reservaData.habitacion_id)
+          .select();
 
         if (habitacionError) {
-          console.error('Error al liberar habitación:', habitacionError);
+          console.error('❌ Error al liberar habitación:', habitacionError);
+          throw habitacionError;
         }
+
+        console.log('✅ Habitación liberada exitosamente:', habitacionData);
+      } else {
+        console.warn('⚠️ No se encontró habitacion_id en la reserva');
       }
 
       alert('Reserva liberada exitosamente. La habitación está ahora disponible.');
       await loadReservas();
       await loadHabitaciones();
     } catch (error) {
+      console.error('❌ Error en handleLiberarReserva:', error);
       alert('Error al liberar reserva: ' + error.message);
     }
   };
@@ -324,26 +359,36 @@ function ModalProcesarPago({ reserva, onClose, onSuccess }) {
     setLoading(true);
 
     try {
+      console.log('🔍 Procesando pago para reserva:', reserva);
+      console.log('🔍 Habitación ID:', reserva.habitacion_id);
+
       // Actualizar estado de la reserva a 'confirmada'
-      const { error: reservaError } = await supabase
+      const { error: reservaError, data: reservaData } = await supabase
         .from('reservas')
         .update({ estado: 'confirmada' })
-        .eq('id', reserva.id);
+        .eq('id', reserva.id)
+        .select();
 
       if (reservaError) throw reservaError;
+      console.log('✅ Reserva actualizada:', reservaData);
 
       // Cambiar estado de la habitación a 'ocupada'
-      const { error: habitacionError } = await supabase
+      const { error: habitacionError, data: habitacionData } = await supabase
         .from('habitaciones')
         .update({ estado: 'ocupada' })
-        .eq('id', reserva.habitacion_id);
+        .eq('id', reserva.habitacion_id)
+        .select();
 
-      if (habitacionError) throw habitacionError;
+      if (habitacionError) {
+        console.error('❌ Error al actualizar habitación:', habitacionError);
+        throw habitacionError;
+      }
+      console.log('✅ Habitación actualizada:', habitacionData);
 
-      alert(`Pago de $${reserva.precio_total} procesado exitosamente vía ${metodoPago}`);
+      alert(`Pago de $${reserva.precio_total} procesado exitosamente vía ${metodoPago}. Habitación cambiada a OCUPADA.`);
       onSuccess();
     } catch (error) {
-      console.error('Error al procesar pago:', error);
+      console.error('❌ Error al procesar pago:', error);
       alert('Error al procesar pago: ' + error.message);
     } finally {
       setLoading(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx'
+import { supabase } from '../../../cliente/SERVICIOS/supabaseClient'
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../../../cliente/ESTILOS/Dashboard.css';
 import ModalReservaHabitacion from './ModalReservaHabitacion.jsx';
@@ -144,13 +144,13 @@ function HuespedDashboard() {
               {reservas.map((reserva) => (
                 <div key={reserva.id} className="reserva-card">
                   <div className="reserva-header">
-                    <h3>Habitación {reserva.habitaciones.numero}</h3>
+                    <h3>Habitación {reserva.habitaciones?.numero || reserva.habitacion_id}</h3>
                     <span className={`badge badge-${reserva.estado}`}>
                       {reserva.estado}
                     </span>
                   </div>
                   <div className="reserva-details">
-                    <p><i className="fas fa-bed"></i> {reserva.habitaciones.tipo}</p>
+                    <p><i className="fas fa-bed"></i> {reserva.habitaciones?.tipo || 'N/A'}</p>
                     <p><i className="fas fa-calendar-check"></i> Check-in: {reserva.fecha_entrada}</p>
                     <p><i className="fas fa-calendar-times"></i> Check-out: {reserva.fecha_salida}</p>
                     <p><i className="fas fa-users"></i> Huéspedes: {reserva.numero_huespedes}</p>

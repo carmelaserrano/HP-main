@@ -711,19 +711,47 @@ function ModalOperador({ onClose, onSuccess, operador }) {
         }
 
         if (authData.user) {
-          const { error: profileError } = await supabase
+          // Primero verificar si el profile ya existe
+          const { data: existingProfile } = await supabase
             .from('profiles')
-            .insert([{
-              id: authData.user.id,
-              nombre: formData.nombre,
-              telefono: formData.telefono,
-              rol: 'operador',
-              activo: true
-            }]);
+            .select('id')
+            .eq('id', authData.user.id)
+            .single();
 
-          if (profileError) {
-            console.error('Error al crear profile:', profileError);
-            throw profileError;
+          if (existingProfile) {
+            // Si ya existe, actualizarlo
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({
+                nombre: formData.nombre,
+                email: formData.email,
+                telefono: formData.telefono,
+                rol: 'operador',
+                activo: true
+              })
+              .eq('id', authData.user.id);
+
+            if (updateError) {
+              console.error('Error al actualizar profile:', updateError);
+              throw updateError;
+            }
+          } else {
+            // Si no existe, crearlo
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .insert([{
+                id: authData.user.id,
+                nombre: formData.nombre,
+                email: formData.email,
+                telefono: formData.telefono,
+                rol: 'operador',
+                activo: true
+              }]);
+
+            if (profileError) {
+              console.error('Error al crear profile:', profileError);
+              throw profileError;
+            }
           }
         }
 
