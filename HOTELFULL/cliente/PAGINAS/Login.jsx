@@ -84,13 +84,11 @@ function Login() {
     <PageTransition>
     <div className="login-page">
       <div className="login-container">
-        <button
+        {/*<button
           onClick={() => navigate('/')}
           className="btn-back"
           type="button"
-        >
-          ← {t('login.button')}
-        </button>
+        ></button>*/}
 
         <div className="login-header">
           <h1>{t('login.title')}</h1>
