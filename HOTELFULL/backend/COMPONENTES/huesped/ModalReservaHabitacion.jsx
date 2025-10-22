@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient';
-import '../../../cliente/ESTILOS/Dashboard.css';
+import '../../ESTILOS/DashboardStyles.css';
 
 function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
   const [formData, setFormData] = useState({
@@ -46,9 +46,12 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
         return;
       }
 
-      // Validar fechas
-      const entrada = new Date(formData.fecha_entrada);
-      const salida = new Date(formData.fecha_salida);
+       // Validar fechas - crear fechas en zona horaria local
+      const [yearEntrada, monthEntrada, dayEntrada] = formData.fecha_entrada.split('-').map(Number);
+      const [yearSalida, monthSalida, daySalida] = formData.fecha_salida.split('-').map(Number);
+
+      const entrada = new Date(yearEntrada, monthEntrada - 1, dayEntrada);
+      const salida = new Date(yearSalida, monthSalida - 1, daySalida);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
 
@@ -106,19 +109,28 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
       if (error) {
         throw error;
       }
+       // Verificar si la fecha de entrada es HOY
+      const hoyStr = new Date().toISOString().split('T')[0];
+      const esHoy = formData.fecha_entrada === hoyStr;
 
-      // Actualizar estado de la habitación a 'ocupada'
-      const { error: habitacionError } = await supabase
-        .from('habitaciones')
-        .update({ estado: 'ocupada' })
-        .eq('id', habitacionData.id);
+      // Solo marcar como ocupada si el check-in es HOY
+      if (esHoy) {
+        const { error: habitacionError } = await supabase
+          .from('habitaciones')
+          .update({ estado: 'ocupada' })
+          .eq('id', habitacionData.id);
 
-      if (habitacionError) {
-        console.error('Error al actualizar habitación:', habitacionError);
-        // No bloqueamos la reserva si falla esto
+        if (habitacionError) {
+          console.error('Error al actualizar habitación:', habitacionError);
+        }
       }
+      // Si el check-in es en el futuro, la habitación queda "disponible" hasta ese día
 
-      alert('¡Reserva creada exitosamente! La habitación ha sido marcada como ocupada.');
+      const mensaje = esHoy
+        ? '¡Reserva creada exitosamente! La habitación está ahora ocupada.'
+        : '¡Reserva creada exitosamente! La habitación se marcará como ocupada el día de tu check-in.';
+
+      alert(mensaje);
       onSuccess();
       
     } catch (error) {
@@ -139,7 +151,6 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
           <p><strong>Precio por noche:</strong> ${habitacion?.precio_por_noche}</p>
           <p><strong>Capacidad:</strong> {habitacion?.capacidad} Huéspedes</p>
         </div>
-
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Fecha de Entrada *</label>
@@ -148,6 +159,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
               value={formData.fecha_entrada}
               onChange={(e) => setFormData({...formData, fecha_entrada: e.target.value})}
               min={new Date().toISOString().split('T')[0]}
+              // esto evita fechas pasadas 
               required
             />
           </div>
@@ -188,7 +200,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
 
           {precioTotal > 0 && (
             <div className="precio-total-box">
-              <h3>💰 Total: ${precioTotal}</h3>
+              <h3>Total: ${precioTotal}</h3>
               <small>
                 {Math.ceil((new Date(formData.fecha_salida) - new Date(formData.fecha_entrada)) / (1000 * 60 * 60 * 24))} 
                 {' '}noche(s) × ${habitacion?.precio_por_noche}
@@ -210,4 +222,4 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
   );
 }
 
-export default ModalReservaHabitacion;
+export default ModalReservaHabitacion;    

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient';
-import '../../../cliente/ESTILOS/Dashboard.css';
+import '../../ESTILOS/DashboardStyles.css';
 
 function ModalReservaServicio({ onClose, onSuccess }) {
   const [servicios, setServicios] = useState([]);

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient'
 import { useNavigate, useLocation } from 'react-router-dom';
-import '../../../cliente/ESTILOS/Dashboard.css';
+import '../../ESTILOS/DashboardStyles.css';
 import ModalReservaHabitacion from './ModalReservaHabitacion.jsx';
 import ModalReservaServicio from './ModalReservaServicio.jsx';
+
 
 function HuespedDashboard() {
   const [showModalReservaHabitacion, setShowModalReservaHabitacion] = useState(false);
@@ -76,6 +77,7 @@ function HuespedDashboard() {
 
       setReservas(reservasData || []);
 
+
       // Obtener reservas de servicios
       await loadServiciosReservados(session.user.id);
 
@@ -97,6 +99,38 @@ function HuespedDashboard() {
 
     if (!error) {
       setReservasServicios(data || []);
+    }
+  };
+
+  const handleCancelarReserva = async (reserva) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta reserva?')) return;
+
+    try {
+      // Cancelar la reserva
+      const { error: reservaError } = await supabase
+        .from('reservas')
+        .update({ estado: 'cancelada' })
+        .eq('id', reserva.id);
+
+      if (reservaError) throw reservaError;
+
+      // Liberar la habitación (volver a disponible)
+      if (reserva.habitacion_id) {
+        const { error: habitacionError } = await supabase
+          .from('habitaciones')
+          .update({ estado: 'disponible' })
+          .eq('id', reserva.habitacion_id);
+
+        if (habitacionError) {
+          console.error('Error al liberar habitación:', habitacionError);
+        }
+      }
+
+      alert('Reserva cancelada exitosamente');
+      loadUserData(); // Recargar datos
+    } catch (error) {
+      console.error('Error al cancelar reserva:', error);
+      alert('Error al cancelar la reserva: ' + error.message);
     }
   };
 
@@ -158,16 +192,33 @@ function HuespedDashboard() {
                       <i className="fas fa-dollar-sign"></i> Total: ${reserva.total}
                     </p>
                   </div>
+                  {(reserva.estado === 'pendiente' || reserva.estado === 'confirmada') && (
+                    <button
+                      onClick={() => handleCancelarReserva(reserva)}
+                      className="btn-cancelar"
+                      style={{
+                        marginTop: '10px',
+                        padding: '8px 16px',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Cancelar Reserva
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* NUEVA SECCIÓN: Servicios Reservados */}
+        {/* NUEVA SECCIÓN: Servicios Reservados*/}
         {reservasServicios.length > 0 && (
           <div className="dashboard-card">
-            <h2>✨ Mis Servicios Reservados</h2>
+            <h2>Mis Servicios Reservados</h2>
             <div className="reservas-list">
               {reservasServicios.map((reserva) => (
                 <div key={reserva.id} className="reserva-card">
@@ -193,7 +244,7 @@ function HuespedDashboard() {
 
         {/* SECCIÓN: Acciones Rápidas */}
         <div className="dashboard-card">
-          <h2>⚡ Acciones Rápidas</h2>
+          <h2>Acciones Rápidas</h2>
           <div className="quick-actions">
             <button onClick={() => navigate('/rooms')} className="action-btn">
               <i className="fas fa-bed"></i>
@@ -215,7 +266,10 @@ function HuespedDashboard() {
       {showModalReservaHabitacion && (
         <ModalReservaHabitacion
           onClose={() => setShowModalReservaHabitacion(false)}
-          onSuccess={loadUserData}
+          onSuccess={() => {
+            loadUserData();
+            setShowModalReservaHabitacion(false);
+          }}
           habitacion={habitacionSeleccionada}
         />
       )}

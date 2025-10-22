@@ -146,10 +146,6 @@ function Login() {
           </div>
 
           <div className="form-options">
-            <label className="remember-me">
-              <input type="checkbox" />
-              <span>{t('login.recordarme')}</span>
-            </label>
             <Link to="/recuperar-password" className="forgot-password">
               {t('login.olvidar')}
             </Link>

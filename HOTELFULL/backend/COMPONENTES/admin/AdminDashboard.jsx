@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx';
 import { useNavigate } from 'react-router-dom';
-import '../../../cliente/ESTILOS/Dashboard.css';
+import '../../ESTILOS/DashboardStyles.css';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 
 function AdminDashboard() {
@@ -166,7 +166,7 @@ function AdminDashboard() {
 
       {/* Header */}
       <div className="dashboard-header admin-header">
-        <h1>👑 Panel de Administrador - {user?.nombre}</h1>
+        <h1>Panel de Administrador - {user?.nombre}</h1>
         <button onClick={handleLogout} className="btn-logout">
           Cerrar Sesión
         </button>
@@ -233,7 +233,7 @@ function AdminDashboard() {
 
             {/* Gráfico de Torta con Recharts */}
             <div className="dashboard-card chart-card">
-              <h2>📊 Estado de Habitaciones</h2>
+              <h2>Estado de Habitaciones</h2>
               <div className="pie-chart-simple">
                 <ResponsiveContainer width="100%" height={350}>
                   <PieChart>

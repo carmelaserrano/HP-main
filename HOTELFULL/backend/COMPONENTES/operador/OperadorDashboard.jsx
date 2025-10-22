@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx';
 import { useNavigate } from 'react-router-dom';
-import '../../../cliente/ESTILOS/Dashboard.css';
+import '../../ESTILOS/DashboardStyles.css';
+
 
 function OperadorDashboard() {
   const [user, setUser] = useState(null);
@@ -24,6 +25,7 @@ function OperadorDashboard() {
 
   const loadData = async () => {
     try {
+
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
@@ -83,8 +85,7 @@ function OperadorDashboard() {
       console.error('Error al cargar reservas:', error);
     }
   };
-
-  const handleLiberarReserva = async (reservaId) => {
+const handleLiberarReserva = async (reservaId) => {
     if (!confirm('¿Estás seguro de liberar esta reserva?')) return;
 
     try {
@@ -104,7 +105,27 @@ function OperadorDashboard() {
 
       console.log('📋 Datos de reserva obtenidos:', reservaData);
 
-      // Cancelar la reserva
+      if (!reservaData?.habitacion_id) {
+        throw new Error('No se encontró habitacion_id en la reserva');
+      }
+
+      // Liberar la habitación PRIMERO (volver a disponible)
+      console.log('🏠 Liberando habitación ID:', reservaData.habitacion_id);
+
+      const { error: habitacionError, data: habitacionData } = await supabase
+        .from('habitaciones')
+        .update({ estado: 'disponible' })
+        .eq('id', reservaData.habitacion_id)
+        .select();
+
+      if (habitacionError) {
+        console.error('❌ Error al liberar habitación:', habitacionError);
+        throw habitacionError;
+      }
+
+      console.log('✅ Habitación liberada exitosamente:', habitacionData);
+
+      // DESPUÉS cancelar la reserva
       const { error: reservaError } = await supabase
         .from('reservas')
         .update({ estado: 'cancelada' })
@@ -117,29 +138,11 @@ function OperadorDashboard() {
 
       console.log('✅ Reserva cancelada exitosamente');
 
-      // Liberar la habitación (volver a disponible)
-      if (reservaData?.habitacion_id) {
-        console.log('🏠 Intentando liberar habitación ID:', reservaData.habitacion_id);
-
-        const { error: habitacionError, data: habitacionData } = await supabase
-          .from('habitaciones')
-          .update({ estado: 'disponible' })
-          .eq('id', reservaData.habitacion_id)
-          .select();
-
-        if (habitacionError) {
-          console.error('❌ Error al liberar habitación:', habitacionError);
-          throw habitacionError;
-        }
-
-        console.log('✅ Habitación liberada exitosamente:', habitacionData);
-      } else {
-        console.warn('⚠️ No se encontró habitacion_id en la reserva');
-      }
+      // Recargar datos
+      await loadHabitaciones();
+      await loadReservas();
 
       alert('Reserva liberada exitosamente. La habitación está ahora disponible.');
-      await loadReservas();
-      await loadHabitaciones();
     } catch (error) {
       console.error('❌ Error en handleLiberarReserva:', error);
       alert('Error al liberar reserva: ' + error.message);
@@ -249,7 +252,7 @@ function OperadorDashboard() {
                           {reserva.estado}
                         </span>
                       </td>
-                      <td><strong>${reserva.precio_total}</strong></td>
+                      <td><strong>${reserva.total}</strong></td>
                       <td>
                         <button
                           className="btn-danger"
@@ -300,7 +303,7 @@ function OperadorDashboard() {
                       <td>
                         {new Date(reserva.fecha_entrada).toLocaleDateString()} - {new Date(reserva.fecha_salida).toLocaleDateString()}
                       </td>
-                      <td><strong>${reserva.precio_total}</strong></td>
+                      <td><strong>${reserva.total}</strong></td>
                       <td>
                         <span className="badge badge-pendiente">
                           Pendiente de pago
@@ -380,15 +383,15 @@ function ModalProcesarPago({ reserva, onClose, onSuccess }) {
         .select();
 
       if (habitacionError) {
-        console.error('❌ Error al actualizar habitación:', habitacionError);
+        console.error(' Error al actualizar habitación:', habitacionError);
         throw habitacionError;
       }
       console.log('✅ Habitación actualizada:', habitacionData);
 
-      alert(`Pago de $${reserva.precio_total} procesado exitosamente vía ${metodoPago}. Habitación cambiada a OCUPADA.`);
+      alert(`Pago de $${reserva.total} procesado exitosamente vía ${metodoPago}. Habitación cambiada a OCUPADA.`);
       onSuccess();
     } catch (error) {
-      console.error('❌ Error al procesar pago:', error);
+      console.error(' Error al procesar pago:', error);
       alert('Error al procesar pago: ' + error.message);
     } finally {
       setLoading(false);
@@ -406,7 +409,7 @@ function ModalProcesarPago({ reserva, onClose, onSuccess }) {
           <p><strong>Check-in:</strong> {new Date(reserva.fecha_entrada).toLocaleDateString()}</p>
           <p><strong>Check-out:</strong> {new Date(reserva.fecha_salida).toLocaleDateString()}</p>
           <p style={{ fontSize: '1.3rem', marginTop: '15px' }}>
-            <strong>Total a cobrar: ${reserva.precio_total}</strong>
+            <strong>Total a cobrar: ${reserva.total}</strong>
           </p>
         </div>
 
