@@ -653,11 +653,11 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
 // MODAL OPERADOR
 function ModalOperador({ onClose, onSuccess, operador }) {
   const [formData, setFormData] = useState({
-    nombre: operador?.nombre || '',
-    email: operador?.email || '',
-    telefono: operador?.telefono || '',
-    password: ''
-  });
+  nombre: operador?.nombre || '',
+  email: operador?.email || '',
+  telefono: operador?.telefono || '',
+  password: ''
+});
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -688,16 +688,16 @@ function ModalOperador({ onClose, onSuccess, operador }) {
         }
 
         const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            data: {
-              nombre: formData.nombre,
-              telefono: formData.telefono,
-              rol: 'operador'
-            }
-          }
-        });
+  email: formData.email,
+  password: formData.password,
+  options: {
+    data: {
+      nombre: formData.nombre,
+      telefono: formData.telefono,
+      rol: 'operador'
+    }
+  }
+});
 
         if (authError) {
           console.error('Error en signUp:', authError);
@@ -720,16 +720,16 @@ function ModalOperador({ onClose, onSuccess, operador }) {
 
           if (existingProfile) {
             // Si ya existe, actualizarlo
-            const { error: updateError } = await supabase
-              .from('profiles')
-              .update({
-                nombre: formData.nombre,
-                email: formData.email,
-                telefono: formData.telefono,
-                rol: 'operador',
-                activo: true
-              })
-              .eq('id', authData.user.id);
+           const { error: updateError } = await supabase
+  .from('profiles')
+  .update({
+    nombre: formData.nombre,
+    email: formData.email,  // ✅ Ahora SÍ agrégalo
+    telefono: formData.telefono,
+    rol: 'operador',
+    activo: true
+  })
+  .eq('id', authData.user.id);
 
             if (updateError) {
               console.error('Error al actualizar profile:', updateError);
@@ -738,16 +738,15 @@ function ModalOperador({ onClose, onSuccess, operador }) {
           } else {
             // Si no existe, crearlo
             const { error: profileError } = await supabase
-              .from('profiles')
-              .insert([{
-                id: authData.user.id,
-                nombre: formData.nombre,
-                email: formData.email,
-                telefono: formData.telefono,
-                rol: 'operador',
-                activo: true
-              }]);
-
+  .from('profiles')
+  .insert([{
+    id: authData.user.id,
+    nombre: formData.nombre,
+    email: formData.email,  // ✅ Ahora SÍ agrégalo
+    telefono: formData.telefono,
+    rol: 'operador',
+    activo: true
+  }]);
             if (profileError) {
               console.error('Error al crear profile:', profileError);
               throw profileError;
@@ -783,18 +782,16 @@ function ModalOperador({ onClose, onSuccess, operador }) {
             />
           </div>
 
+
           <div className="form-group">
             <label>Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
-              disabled={!!operador}
+              placeholder="correo@ejemplo.com"
               required
             />
-          </div>
-
-          <div className="form-group">
             <label>Teléfono</label>
             <input
               type="tel"
