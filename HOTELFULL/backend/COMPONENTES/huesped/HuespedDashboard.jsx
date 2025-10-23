@@ -14,6 +14,7 @@ function HuespedDashboard() {
   const [reservas, setReservas] = useState([]);
   const [reservasServicios, setReservasServicios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('reservas');
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -151,118 +152,129 @@ function HuespedDashboard() {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>🏨 Bienvenido, {user?.nombre}</h1>
+        <h1>Bienvenido, {user?.nombre}</h1>
         <button onClick={handleLogout} className="btn-logout">
           Cerrar Sesión
         </button>
       </div>
 
+      {/* Navigation Tabs */}
+      <div className="dashboard-tabs">
+        <button
+          className={activeSection === 'reservas' ? 'tab-active' : 'tab'}
+          onClick={() => setActiveSection('reservas')}
+        >
+          Mis Reservas
+        </button>
+        <button
+          className={activeSection === 'acciones' ? 'tab-active' : 'tab'}
+          onClick={() => setActiveSection('acciones')}
+        >
+          Acciones Rápidas
+        </button>
+      </div>
+
       <div className="dashboard-content">
-        {/* SECCIÓN: Reservas de Habitaciones */}
-        <div className="dashboard-card">
-          <h2>📅 Mis Reservas de Habitaciones</h2>
+        {/* SECCIÓN: MIS RESERVAS */}
+        {activeSection === 'reservas' && (
+          <>
+            {/* Reservas de Habitaciones */}
+            <div className="dashboard-card">
+              <h2>Mis Reservas de Habitaciones</h2>
 
-          {reservas.length === 0 ? (
-            <div className="empty-state">
-              <i className="fas fa-calendar-times"></i>
-              <p>No tienes reservas de habitaciones aún</p>
-              <button
-                onClick={() => navigate('/rooms')}
-                className="btn-primary"
-              >
-                Ver Habitaciones
-              </button>
-            </div>
-          ) : (
-            <div className="reservas-list">
-              {reservas.map((reserva) => (
-                <div key={reserva.id} className="reserva-card">
-                  <div className="reserva-header">
-                    <h3>Habitación {reserva.habitaciones?.numero || reserva.habitacion_id}</h3>
-                    <span className={`badge badge-${reserva.estado}`}>
-                      {reserva.estado}
-                    </span>
-                  </div>
-                  <div className="reserva-details">
-                    <p><i className="fas fa-bed"></i> {reserva.habitaciones?.tipo || 'N/A'}</p>
-                    <p><i className="fas fa-calendar-check"></i> Check-in: {reserva.fecha_entrada}</p>
-                    <p><i className="fas fa-calendar-times"></i> Check-out: {reserva.fecha_salida}</p>
-                    <p><i className="fas fa-users"></i> Huéspedes: {reserva.numero_huespedes}</p>
-                    <p className="reserva-total">
-                      <i className="fas fa-dollar-sign"></i> Total: ${reserva.total}
-                    </p>
-                  </div>
-                  {(reserva.estado === 'pendiente' || reserva.estado === 'confirmada') && (
-                    <button
-                      onClick={() => handleCancelarReserva(reserva)}
-                      className="btn-cancelar"
-                      style={{
-                        marginTop: '10px',
-                        padding: '8px 16px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Cancelar Reserva
-                    </button>
-                  )}
+              {reservas.length === 0 ? (
+                <div className="empty-state">
+                  <i className="fas fa-calendar-times"></i>
+                  <p>No tienes reservas de habitaciones aún</p>
+                  <button
+                    onClick={() => navigate('/rooms')}
+                    className="btn-primary"
+                  >
+                    Ver Habitaciones
+                  </button>
                 </div>
-              ))}
+              ) : (
+                <div className="reservas-list">
+                  {reservas.map((reserva) => (
+                    <div key={reserva.id} className="reserva-card">
+                      <div className="reserva-header">
+                        <h3>Habitación {reserva.habitaciones?.numero || reserva.habitacion_id}</h3>
+                        <span className={`badge badge-${reserva.estado}`}>
+                          {reserva.estado}
+                        </span>
+                      </div>
+                      <div className="reserva-details">
+                        <p><strong>Tipo:</strong> {reserva.habitaciones?.tipo || 'N/A'}</p>
+                        <p><strong>Check-in:</strong> {reserva.fecha_entrada}</p>
+                        <p><strong>Check-out:</strong> {reserva.fecha_salida}</p>
+                        <p><strong>Huéspedes:</strong> {reserva.numero_huespedes}</p>
+                        <p className="reserva-total">
+                          <strong>Total:</strong> ${reserva.total}
+                        </p>
+                      </div>
+                      {(reserva.estado === 'pendiente' || reserva.estado === 'confirmada') && (
+                        <button
+                          onClick={() => handleCancelarReserva(reserva)}
+                          className="btn-cancelar"
+                        >
+                          Cancelar Reserva
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* NUEVA SECCIÓN: Servicios Reservados*/}
-        {reservasServicios.length > 0 && (
+            {/* Servicios Reservados */}
+            {reservasServicios.length > 0 && (
+              <div className="dashboard-card">
+                <h2>Mis Servicios Reservados</h2>
+                <div className="reservas-list">
+                  {reservasServicios.map((reserva) => (
+                    <div key={reserva.id} className="reserva-card">
+                      <div className="reserva-header">
+                        <h3>{reserva.servicios_extras?.nombre || 'Servicio'}</h3>
+                        <span className="badge badge-pendiente">
+                          Reservado
+                        </span>
+                      </div>
+                      <div className="reserva-details">
+                        <p><strong>Fecha:</strong> {reserva.fecha_servicio || 'Por confirmar'}</p>
+                        <p><strong>Cantidad:</strong> {reserva.cantidad}</p>
+                        <p><strong>Precio unitario:</strong> ${reserva.precio_unitario}</p>
+                        <p className="reserva-total">
+                          <strong>Subtotal:</strong> ${reserva.subtotal}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* SECCIÓN: ACCIONES RÁPIDAS */}
+        {activeSection === 'acciones' && (
           <div className="dashboard-card">
-            <h2>Mis Servicios Reservados</h2>
-            <div className="reservas-list">
-              {reservasServicios.map((reserva) => (
-                <div key={reserva.id} className="reserva-card">
-                  <div className="reserva-header">
-                    <h3>{reserva.servicios_extras?.nombre || 'Servicio'}</h3>
-                    <span className="badge badge-pendiente">
-                      Reservado
-                    </span>
-                  </div>
-                  <div className="reserva-details">
-                    <p><i className="fas fa-calendar"></i> Fecha: {reserva.fecha_servicio || 'Por confirmar'}</p>
-                    <p><i className="fas fa-hashtag"></i> Cantidad: {reserva.cantidad}</p>
-                    <p><i className="fas fa-dollar-sign"></i> Precio unitario: ${reserva.precio_unitario}</p>
-                    <p className="reserva-total">
-                      <i className="fas fa-calculator"></i> Subtotal: ${reserva.subtotal}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <h2>Acciones Rápidas</h2>
+            <div className="quick-actions">
+              <button onClick={() => navigate('/rooms')} className="action-btn">
+                Reservar Habitación
+              </button>
+              <button onClick={() => setShowModalReservaServicio(true)} className="action-btn">
+                Reservar Servicios
+              </button>
+              <button onClick={() => navigate('/contacto')} className="action-btn">
+                Contacto
+              </button>
             </div>
           </div>
         )}
-
-        {/* SECCIÓN: Acciones Rápidas */}
-        <div className="dashboard-card">
-          <h2>Acciones Rápidas</h2>
-          <div className="quick-actions">
-            <button onClick={() => navigate('/rooms')} className="action-btn">
-              <i className="fas fa-bed"></i>
-              Reservar Habitación
-            </button>
-            <button onClick={() => setShowModalReservaServicio(true)} className="action-btn">
-              <i className="fas fa-spa"></i>
-              Reservar Servicios
-            </button>
-            <button onClick={() => navigate('/contacto')} className="action-btn">
-              <i className="fas fa-phone"></i>
-              Contacto
-            </button>
-          </div>
-        </div>
       </div>
 
-      {/* 🛏️ Modal Reserva Habitación */}
+      {/* Modal Reserva Habitación */}
       {showModalReservaHabitacion && (
         <ModalReservaHabitacion
           onClose={() => setShowModalReservaHabitacion(false)}
@@ -274,7 +286,7 @@ function HuespedDashboard() {
         />
       )}
 
-      {/* ✨ Modal Reserva Servicios */}
+      {/* Modal Reserva Servicios */}
       {showModalReservaServicio && (
         <ModalReservaServicio
           onClose={() => setShowModalReservaServicio(false)}

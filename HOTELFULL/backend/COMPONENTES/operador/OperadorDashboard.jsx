@@ -172,7 +172,7 @@ const handleLiberarReserva = async (reservaId) => {
     <div className="dashboard-container">
       {/* Header */}
       <div className="dashboard-header">
-        <h1>👤 Panel de Operador - {user?.nombre}</h1>
+        <h1>Panel de Operador - {user?.nombre}</h1>
         <button onClick={handleLogout} className="btn-logout">
           Cerrar Sesión
         </button>
@@ -184,27 +184,28 @@ const handleLiberarReserva = async (reservaId) => {
           className={activeSection === 'mapa' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('mapa')}
         >
-          📍 Mapa de Habitaciones
+          Mapa de Habitaciones
         </button>
         <button
           className={activeSection === 'reservas' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('reservas')}
         >
-          📋 Gestión de Reservas
+          Gestión de Reservas
         </button>
         <button
           className={activeSection === 'pagos' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('pagos')}
         >
-          💰 Procesar Pagos
+          Procesar Pagos
         </button>
       </div>
 
       <div className="dashboard-content">
+
         {/* MAPA DE HABITACIONES */}
         {activeSection === 'mapa' && (
           <div className="dashboard-card">
-            <h2>📍 Mapa de Habitaciones</h2>
+            <h2>Mapa de Habitaciones</h2>
             <div className="mapa-simple-grid">
               {habitaciones.map(hab => (
                 <div key={hab.id} className={`hab-simple ${hab.estado}`}>
@@ -220,7 +221,7 @@ const handleLiberarReserva = async (reservaId) => {
         {/* GESTIÓN DE RESERVAS */}
         {activeSection === 'reservas' && (
           <div className="dashboard-card">
-            <h2>📋 Gestión de Reservas Activas</h2>
+            <h2>Gestión de Reservas Activas</h2>
             <div className="table-container">
               <table className="dashboard-table">
                 <thead>
