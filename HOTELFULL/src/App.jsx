@@ -39,9 +39,9 @@ function App() {
         <Route path="/contacto" element={<><Navbar /><Contacto /><Footer /></>} />
         <Route path="/actividades" element={<><Navbar /><Actividades /><Footer /></>} />
         <Route path="/servicios" element={<><Navbar /><Servicios /><Footer /></>} />
-        <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/recuperar-password" element={<RecuperarPassword />} />
+        <Route path="/login" element={<><Navbar /><Login /><Footer /></>} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Rutas protegidas por rol - SIN Navbar y Footer */}
