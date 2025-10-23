@@ -1,43 +1,38 @@
-/* Contenedor principal de la card de clima */
-.weather-container {
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 20px;
-  max-width: 350px;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin: 20px auto;
+/* Weather en el navbar - Estilo sutil */
+.weather-navbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 0.9rem;
+  margin-left: 15px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(236, 234, 233, 0.1);
+  transition: all 0.2s ease;
 }
 
-/* Título fuera de la card */
-.weather-title {
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #333;
+.weather-navbar:hover {
+  background: rgba(243, 242, 242, 0.15);
 }
 
-/* Clima actual dentro de la card */
-.weather-today {
-  margin: 6px 0;
+.weather-navbar i {
+  color: #fbfbfa;
+  font-size: 1rem;
 }
 
-/* Pronóstico semanal */
-.weather-forecast {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  overflow-x: auto;
+.weather-temp {
+  font-weight: 600;
+  color: #272727;
 }
 
-.weather-forecast div {
-  min-width: 60px;
-  text-align: center;
+.weather-condition {
+  color: #77878B;
+  font-size: 0.85rem;
 }
 
-.weather-forecast p {
-  font-size: 12px;
-  margin: 2px 0;
+.weather-loading {
+  color: #999;
+  font-size: 0.9rem;
+  margin-left: 15px;
 }

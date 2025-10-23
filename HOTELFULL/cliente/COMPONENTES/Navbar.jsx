@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { supabase } from '../SERVICIOS/supabaseClient'
 import UserMenu from './UserMenu'
+import Weather from '../API/Weather/Weather.jsx'
 
 function Navbar() {
   const { t, i18n } = useTranslation();
@@ -51,6 +52,7 @@ function Navbar() {
           <div className="contact-info">
             <span className="phone"><i className="fas fa-phone-alt"></i> 1-800-405-1948</span>
             <span className="email"><i className="fas fa-envelope"></i> hotelislabella25@gmail.com</span>
+            <Weather />
           </div>
           <div className="social-icons">
             <a href="https://www.facebook.com/IslaBellaBeachResort/"><i className="fab fa-facebook-f"></i></a>

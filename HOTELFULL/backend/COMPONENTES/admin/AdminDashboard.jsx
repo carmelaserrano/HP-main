@@ -517,6 +517,7 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
     descripcion: habitacion?.descripcion || ''
   });
   const [imageFiles, setImageFiles] = useState([]);
+  const [existingImages, setExistingImages] = useState(habitacion?.imagenes || []);
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -582,15 +583,24 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
     return uploadedUrls;
   };
 
+  const removeExistingImage = (index) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploading(true);
 
     try {
-      const imageUrls = imageFiles.length > 0 ? await uploadImages() : [];
+      // Subir las nuevas imágenes
+      const newImageUrls = imageFiles.length > 0 ? await uploadImages() : [];
+
+      // Combinar imágenes existentes con las nuevas
+      const allImageUrls = [...existingImages, ...newImageUrls];
+
       const dataToSave = {
         ...formData,
-        ...(imageUrls.length > 0 && { imagenes: imageUrls })
+        imagenes: allImageUrls.length > 0 ? allImageUrls : []
       };
 
       if (habitacion) {
@@ -637,16 +647,9 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
           </div>
 
           <div className="form-group">
-            <label>Tipo</label>
-            <select
-              value={formData.tipo}
-              onChange={(e) => setFormData({...formData, tipo: e.target.value})}
-            >
-              <option>Simple</option>
-              <option>Doble</option>
-              <option>Suite</option>
-              <option>Presidencial</option>
-            </select>
+            <label>Nombre</label>
+            <input type="text" 
+            onChange={(e) => setFormData({...formData, tipo: e.target.value})}/>
           </div>
 
           <div className="form-group">
@@ -679,7 +682,39 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
           </div>
 
           <div className="form-group">
-            <label>Imágenes</label>
+            <label>
+              Imágenes
+              {(existingImages.length > 0 || imageFiles.length > 0) &&
+                ` (${existingImages.length + imageFiles.length} total)`}
+            </label>
+
+            {/* Mostrar imágenes existentes */}
+            {existingImages.length > 0 && (
+              <div style={{ marginBottom: '15px' }}>
+                <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '8px' }}>
+                  Imágenes actuales:
+                </p>
+                <div className="image-preview-grid">
+                  {existingImages.map((url, index) => (
+                    <div key={`existing-${index}`} className="image-preview-item">
+                      <img src={url} alt={`Imagen ${index + 1}`} />
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeExistingImage(index);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Zona para agregar nuevas imágenes */}
             <div
               className={`image-upload-zone ${isDragging ? 'dragging' : ''}`}
               onDragOver={handleDragOver}
@@ -697,29 +732,48 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
               />
               <div className="upload-icon">📸</div>
               <p className="upload-text">
-                Arrastra imágenes aquí o haz clic
+                <strong>Arrastra múltiples imágenes aquí o haz clic para seleccionar</strong>
+              </p>
+              <p className="upload-text" style={{ fontSize: '0.85em', marginTop: '5px', color: '#666' }}>
+                Puedes seleccionar todas las imágenes que quieras (Ctrl/Cmd + clic para selección múltiple)
               </p>
             </div>
 
+            {/* Mostrar nuevas imágenes seleccionadas */}
             {imageFiles.length > 0 && (
-              <div className="image-preview-grid">
-                {imageFiles.map((file, index) => (
-                  <div key={index} className="image-preview-item">
-                    <img src={URL.createObjectURL(file)} alt={`Preview ${index + 1}`} />
-                    <button
-                      type="button"
-                      className="remove-image-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeImage(index);
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+              <div style={{ marginTop: '15px' }}>
+                <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '8px' }}>
+                  Nuevas imágenes ({imageFiles.length}):
+                </p>
+                <div className="image-preview-grid">
+                  {imageFiles.map((file, index) => (
+                    <div key={`new-${index}`} className="image-preview-item">
+                      <img src={URL.createObjectURL(file)} alt={`Preview ${index + 1}`} />
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeImage(index);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Botón para agregar más imágenes */}
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ marginTop: '10px', width: '100%' }}
+              onClick={() => document.getElementById('fileInput').click()}
+            >
+              + Agregar más imágenes
+            </button>
           </div>
 
           <div className="modal-buttons">

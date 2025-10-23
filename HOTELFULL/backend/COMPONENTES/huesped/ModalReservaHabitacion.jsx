@@ -65,7 +65,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
         return;
       }
 
-      // Buscar habitación por tipo
+      // Modal q se cambie dependiendo la habitacion que quiere el huesped 
       const { data: habitacionData } = await supabase
         .from('habitaciones')
         .select('id')
@@ -144,7 +144,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>🛏️ Reservar {habitacion?.tipo}</h2>
+        <h2>Reservar {habitacion?.tipo}</h2>
         
         <div className="habitacion-info-box">
           <p><strong>Tipo:</strong> {habitacion?.badge || 'Standard'}</p>

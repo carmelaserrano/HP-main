@@ -3,7 +3,6 @@ import { useState } from 'react'
 import emailjs from '@emailjs/browser'
 import { useTranslation } from 'react-i18next'
 import PageTransition from '../COMPONENTES/PageTransition.jsx'
-import Weather from "../API/Weather/Weather.jsx"
 import Map from "../API/Map/Map.jsx"
 
 function Contacto() {
@@ -147,7 +146,6 @@ function Contacto() {
           </div>
         </div>
       </div>
-      <Weather />
 
 
     </div>
