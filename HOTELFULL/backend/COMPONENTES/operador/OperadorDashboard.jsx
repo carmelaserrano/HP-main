@@ -62,16 +62,64 @@ function OperadorDashboard() {
 
     if (error) {
       console.error('❌ Error al cargar habitaciones:', error);
-    } else {
-      console.log('✅ Habitaciones cargadas:', data);
-      // Mostrar específicamente la habitación 301
-      const hab301 = data.find(h => h.numero === '301' || h.numero === 301);
-      if (hab301) {
-        console.log('🏠 Estado de habitación 301:', hab301);
-      }
+      setHabitaciones([]);
+      return;
     }
 
-    setHabitaciones(data || []);
+    // Cargar reservas activas para calcular el estado real
+    const { data: reservasActivas } = await supabase
+      .from('reservas')
+      .select('*, habitaciones(numero)')
+      .in('estado', ['pendiente', 'confirmada']);
+
+    console.log('📅 Reservas activas encontradas:', reservasActivas);
+
+    const hoy = new Date().toISOString().split('T')[0];
+    console.log('📅 Fecha de hoy:', hoy);
+
+    // Calcular estado real de cada habitación
+    const habitacionesConEstadoReal = (data || []).map(hab => {
+      // Buscar si tiene reserva activa para hoy
+      const tieneReservaActiva = (reservasActivas || []).some(reserva => {
+        const fechaEntrada = reserva.fecha_entrada;
+        const fechaSalida = reserva.fecha_salida;
+
+        const cumpleCondicion = reserva.habitacion_id === hab.id &&
+               fechaEntrada <= hoy &&
+               fechaSalida >= hoy;
+
+        if (hab.numero === '601' || hab.numero === 601) {
+          console.log(`🔍 Habitación 601:`, {
+            reserva_id: reserva.id,
+            habitacion_numero: reserva.habitaciones?.numero,
+            fechaEntrada,
+            fechaSalida,
+            hoy,
+            cumpleCondicion
+          });
+        }
+
+        return cumpleCondicion;
+      });
+
+      const estadoFinal = tieneReservaActiva ? 'ocupada' : hab.estado;
+
+      if (hab.numero === '601' || hab.numero === 601) {
+        console.log(`🏠 Habitación 601 estado final:`, {
+          tieneReservaActiva,
+          estadoOriginal: hab.estado,
+          estadoFinal
+        });
+      }
+
+      return {
+        ...hab,
+        estadoReal: estadoFinal
+      };
+    });
+
+    console.log('✅ Habitaciones con estado real:', habitacionesConEstadoReal);
+    setHabitaciones(habitacionesConEstadoReal);
   };
 
   const loadReservas = async () => {
@@ -148,14 +196,14 @@ const handleLiberarReserva = async (reservaId) => {
         throw fetchError;
       }
 
-      console.log('📋 Datos de reserva obtenidos:', reservaData);
+      console.log('Datos de reserva obtenidos:', reservaData);
 
       if (!reservaData?.habitacion_id) {
         throw new Error('No se encontró habitacion_id en la reserva');
       }
 
       // Liberar la habitación PRIMERO (volver a disponible)
-      console.log('🏠 Liberando habitación ID:', reservaData.habitacion_id);
+      console.log('Liberando habitación ID:', reservaData.habitacion_id);
 
       const { error: habitacionError, data: habitacionData } = await supabase
         .from('habitaciones')
@@ -258,13 +306,16 @@ const handleLiberarReserva = async (reservaId) => {
           <div className="dashboard-card">
             <h2>Mapa de Habitaciones</h2>
             <div className="mapa-simple-grid">
-              {habitaciones.map(hab => (
-                <div key={hab.id} className={`hab-simple ${hab.estado}`}>
-                  <div className="hab-simple-numero">{hab.numero}</div>
-                  <div className="hab-simple-tipo">{hab.tipo}</div>
-                  <div className="hab-simple-estado">{hab.estado}</div>
-                </div>
-              ))}
+              {habitaciones.map(hab => {
+                const estado = (hab.estadoReal || hab.estado || 'disponible').toLowerCase();
+                return (
+                  <div key={hab.id} className={`hab-simple ${estado}`}>
+                    <div className="hab-simple-numero">{hab.numero}</div>
+                    <div className="hab-simple-tipo">{hab.tipo}</div>
+                    <div className="hab-simple-estado">{estado.toUpperCase()}</div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -312,8 +363,8 @@ const handleLiberarReserva = async (reservaId) => {
                         <br />
                         <small>{reserva.habitaciones?.tipo}</small>
                       </td>
-                      <td>{new Date(reserva.fecha_entrada).toLocaleDateString()}</td>
-                      <td>{new Date(reserva.fecha_salida).toLocaleDateString()}</td>
+                      <td>{reserva.fecha_entrada.split('-').reverse().join('/')}</td>
+                      <td>{reserva.fecha_salida.split('-').reverse().join('/')}</td>
                       <td>{reserva.numero_huespedes}</td>
                       <td>
                         <span className={`badge badge-${reserva.estado}`}>

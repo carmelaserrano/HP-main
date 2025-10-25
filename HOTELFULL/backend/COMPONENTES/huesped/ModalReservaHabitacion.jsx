@@ -90,7 +90,10 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
           .in("estado", ["pendiente", "confirmada"]);
 
         if (errorRes) throw errorRes;
-
+// // "El sistema permite que una persona reserve el día de check-out de otra reserva porque en la operativa hotelera real:
+// Check-out: 11:00 AM (huésped anterior se retira)
+// Check-in: 14:00 PM (nuevo huésped ingresa)
+// Por lo tanto, hay un período de 3 horas (11 AM - 2 PM) para limpieza y preparación de la habitación. Esto permite maximizar la ocupación del hotel sin conflictos."
         const haySolapamiento = reservasExistentes.some((r) => {
           const inicio = new Date(r.fecha_entrada);
           const fin = new Date(r.fecha_salida);
