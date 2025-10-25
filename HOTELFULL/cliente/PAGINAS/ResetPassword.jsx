@@ -139,6 +139,7 @@ function ResetPassword() {
               <>
                 <span className="spinner"></span>
                 Actualizando...
+                
               </>
             ) : (
               'Cambiar Contraseña'

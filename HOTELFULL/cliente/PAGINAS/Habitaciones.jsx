@@ -155,7 +155,7 @@ function Habitaciones() {
     const { data, error } = await supabase
       .from('habitaciones')
       .select('*')
-      .eq('estado', 'disponible');
+  
 
     if (error) {
       console.error('Error al cargar habitaciones:', error);

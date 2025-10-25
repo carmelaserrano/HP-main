@@ -124,12 +124,12 @@ function UserMenu() {
               {isInDashboard ? (
                 <>
                   <i className="fas fa-home"></i>
-                  <span>Volver al Inicio</span>
+                  <span style={{ color: '#19191a', fontWeight: '500' }}>Volver al Inicio</span>
                 </>
               ) : (
                 <>
                   <i className="fas fa-tachometer-alt"></i>
-                  <span>Ir a Dashboard</span>
+                  <span style={{ color: '#19191a', fontWeight: '500' }}>Ir a Dashboard</span>
                 </>
               )}
             </button>

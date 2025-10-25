@@ -12,6 +12,7 @@ function OperadorDashboard() {
   // Estados para datos
   const [habitaciones, setHabitaciones] = useState([]);
   const [reservas, setReservas] = useState([]);
+  const [serviciosReservados, setServiciosReservados] = useState([]);
 
   // Estados para modales
   const [showPagoModal, setShowPagoModal] = useState(false);
@@ -43,6 +44,7 @@ function OperadorDashboard() {
 
       await loadHabitaciones();
       await loadReservas();
+      await loadServiciosReservados();
 
       setLoading(false);
     } catch (error) {
@@ -75,7 +77,11 @@ function OperadorDashboard() {
   const loadReservas = async () => {
     const { data, error } = await supabase
       .from('reservas')
-      .select('*, habitaciones(numero, tipo)')
+      .select(`
+        *,
+        habitaciones(numero, tipo),
+        profiles(nombre, email, telefono)
+      `)
       .in('estado', ['pendiente', 'confirmada'])
       .order('fecha_entrada', { ascending: true });
 
@@ -85,6 +91,45 @@ function OperadorDashboard() {
       console.error('Error al cargar reservas:', error);
     }
   };
+
+  const loadServiciosReservados = async () => {
+    const { data, error } = await supabase
+      .from('reserva_servicio')
+      .select(`
+        *,
+        servicios_extras (
+          nombre,
+          descripcion,
+          precio
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error) {
+      setServiciosReservados(data || []);
+    } else {
+      console.error('Error al cargar servicios reservados:', error);
+    }
+  };
+  const handleEliminarServicio = async (servicioId) => {
+    if (!confirm('¿Estás seguro de eliminar este servicio reservado?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('reserva_servicio')
+        .delete()
+        .eq('id', servicioId);
+
+      if (error) throw error;
+
+      alert('✅ Servicio eliminado exitosamente');
+      await loadServiciosReservados();
+    } catch (error) {
+      console.error('Error al eliminar servicio:', error);
+      alert('❌ Error al eliminar servicio: ' + error.message);
+    }
+  };
+
 const handleLiberarReserva = async (reservaId) => {
     if (!confirm('¿Estás seguro de liberar esta reserva?')) return;
 
@@ -193,6 +238,12 @@ const handleLiberarReserva = async (reservaId) => {
           Gestión de Reservas
         </button>
         <button
+          className={activeSection === 'servicios' ? 'tab-active' : 'tab'}
+          onClick={() => setActiveSection('servicios')}
+        >
+          Servicios Reservados
+        </button>
+        <button
           className={activeSection === 'pagos' ? 'tab-active' : 'tab'}
           onClick={() => setActiveSection('pagos')}
         >
@@ -227,10 +278,11 @@ const handleLiberarReserva = async (reservaId) => {
                 <thead>
                   <tr>
                     <th>ID</th>
+                    <th>Huésped</th>
                     <th>Habitación</th>
                     <th>Check-in</th>
                     <th>Check-out</th>
-                    <th>Huéspedes</th>
+                    <th>Personas</th>
                     <th>Estado</th>
                     <th>Total</th>
                     <th>Acciones</th>
@@ -241,13 +293,28 @@ const handleLiberarReserva = async (reservaId) => {
                     <tr key={reserva.id}>
                       <td>#{String(reserva.id).substring(0, 8)}</td>
                       <td>
+                        <strong>{reserva.profiles?.nombre || 'N/A'}</strong>
+                        <br />
+                        <small style={{ color: '#666' }}>
+                          {reserva.profiles?.email || 'Sin email'}
+                        </small>
+                        {reserva.profiles?.telefono && (
+                          <>
+                            <br />
+                            <small style={{ color: '#666' }}>
+                              📞 {reserva.profiles.telefono}
+                            </small>
+                          </>
+                        )}
+                      </td>
+                      <td>
                         <strong>Hab. {reserva.habitaciones?.numero}</strong>
                         <br />
                         <small>{reserva.habitaciones?.tipo}</small>
                       </td>
                       <td>{new Date(reserva.fecha_entrada).toLocaleDateString()}</td>
                       <td>{new Date(reserva.fecha_salida).toLocaleDateString()}</td>
-                      <td>{reserva.numero_huespedes} personas</td>
+                      <td>{reserva.numero_huespedes}</td>
                       <td>
                         <span className={`badge badge-${reserva.estado}`}>
                           {reserva.estado}
@@ -273,6 +340,89 @@ const handleLiberarReserva = async (reservaId) => {
                 </p>
               )}
             </div>
+          </div>
+        )}
+
+        {/* SERVICIOS RESERVADOS */}
+        {activeSection === 'servicios' && (
+          <div className="dashboard-card">
+            <h2>Servicios Reservados</h2>
+            <div className="table-container">
+              <table className="dashboard-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Servicio</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                    <th>Fecha Reserva</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {serviciosReservados.map(servicio => (
+                    <tr key={servicio.id}>
+                      <td>#{servicio.id}</td>
+                      <td>
+                        <strong>{servicio.servicios_extras?.nombre}</strong>
+                        <br />
+                        <small style={{ color: '#666' }}>
+                          {servicio.servicios_extras?.descripcion}
+                        </small>
+                      </td>
+                      <td>{servicio.cantidad}</td>
+                      <td>${servicio.precio_unitario}</td>
+                      <td><strong>${servicio.subtotal}</strong></td>
+                      <td>
+                        {new Date(servicio.created_at).toLocaleDateString('es-ES', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </td>
+                      <td>
+                        <button
+                          className="btn-danger"
+                          onClick={() => handleEliminarServicio(servicio.id)}
+                          style={{ fontSize: '0.85rem', padding: '6px 12px' }}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {serviciosReservados.length === 0 && (
+                <p style={{ textAlign: 'center', padding: '30px', color: '#666' }}>
+                  No hay servicios reservados en este momento
+                </p>
+              )}
+            </div>
+
+            {/* Resumen de servicios */}
+            {serviciosReservados.length > 0 && (
+              <div style={{
+                marginTop: '20px',
+                padding: '15px',
+                background: '#f5f5f5',
+                borderRadius: '8px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <strong>Total de servicios reservados:</strong> {serviciosReservados.length}
+                </div>
+                <div>
+                  <strong>Ingresos totales:</strong> $
+                  {serviciosReservados.reduce((sum, s) => sum + parseFloat(s.subtotal || 0), 0).toFixed(2)}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

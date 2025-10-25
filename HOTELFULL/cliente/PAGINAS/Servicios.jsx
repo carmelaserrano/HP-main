@@ -1,4 +1,6 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../SERVICIOS/supabaseClient';
 import emailjs from '@emailjs/browser';
 import '../ESTILOS/Servicios.css'
 import { useTranslation } from 'react-i18next'
@@ -11,8 +13,10 @@ import PageTransition from '../COMPONENTES/PageTransition.jsx'
 // estado que guarda UN SOLO servicio seleccionado
 const Servicios = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [user, setUser] = useState(null); // ← AGREGAR ESTA LÍNEA
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -24,6 +28,29 @@ const Servicios = () => {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
   const formRef = useRef();
+
+  // Verificar si el usuario está logueado
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    checkUser();
+  }, []);
+
+  const handleReservarClick = async () => {
+    // Verificar si está logueado
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      // No está logueado → redirigir al login
+      navigate('/login');
+      return;
+    }
+
+    // Está logueado → mostrar formulario
+    setShowForm(true);
+  };
 
   const handleInputChange = (e) => {
     setFormData({
@@ -168,7 +195,7 @@ const Servicios = () => {
             <h2>{selectedService.titulo}</h2>
             <p className="descripcion">{selectedService.descripcion}</p>
             <p className="detalles">{selectedService.detalles}</p>
-            <button className="reservar-btn" onClick={() => setShowForm(true)}>{t('servicios.reservar')}</button>
+            <button className="reservar-btn" onClick={handleReservarClick}>{t('servicios.reservar')}</button>
           </div>
         </div>
       )}

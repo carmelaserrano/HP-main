@@ -10,7 +10,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
   color: white;
   border: none;
   border-radius: 25px;
@@ -18,12 +18,12 @@
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
 }
 
 .user-menu-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
 }
 
 .user-avatar {
@@ -80,7 +80,7 @@
 /* Cabecera del menú */
 .dropdown-header {
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
   color: white;
   border-radius: 12px 12px 0 0;
   display: flex;
@@ -132,7 +132,7 @@
   padding: 15px 20px;
   background: white;
   border: none;
-  color: #374151;
+  color: #19191a;
   font-size: 15px;
   font-weight: 500;
   cursor: pointer;
@@ -147,13 +147,13 @@
 }
 
 .dropdown-item:hover {
-  background: #f3f4f6;
+  background: rgba(212, 175, 55, 0.25);
 }
 
 .dropdown-item i {
   width: 20px;
   font-size: 18px;
-  color: #667eea;
+  color: #d4af37;
   text-align: center;
 }
 
@@ -163,15 +163,20 @@
 
 /* Botón de cerrar sesión */
 .logout-btn {
-  color: #dc2626 !important;
+  color: #19191a !important;
 }
 
 .logout-btn i {
-  color: #dc2626 !important;
+  color: #19191a !important;
 }
 
 .logout-btn:hover {
-  background: #fee2e2 !important;
+  background: rgba(212, 175, 55, 0.3) !important;
+  color: #19191a !important;
+}
+
+.logout-btn:hover i {
+  color: #19191a !important;
 }
 
 /* Responsive */

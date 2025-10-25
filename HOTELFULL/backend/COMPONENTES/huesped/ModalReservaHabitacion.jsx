@@ -1,19 +1,18 @@
-
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../../../cliente/SERVICIOS/supabaseClient';
-import '../../ESTILOS/DashboardStyles.css';
+import React, { useState, useEffect } from "react";
+import { supabase } from "../../../cliente/SERVICIOS/supabaseClient";
+import "../../ESTILOS/DashboardStyles.css";
 
 function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
   const [formData, setFormData] = useState({
-    fecha_entrada: '',
-    fecha_salida: '',
+    fecha_entrada: "",
+    fecha_salida: "",
     numero_huespedes: 1,
-    notas: ''
+    notas: "",
   });
   const [precioTotal, setPrecioTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Calcular precio total cuando cambien las fechas
+  // 🔹 Calcular precio total cuando cambian las fechas
   useEffect(() => {
     if (formData.fecha_entrada && formData.fecha_salida && habitacion) {
       calcularPrecio();
@@ -24,7 +23,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
     const entrada = new Date(formData.fecha_entrada);
     const salida = new Date(formData.fecha_salida);
     const dias = Math.ceil((salida - entrada) / (1000 * 60 * 60 * 24));
-    
+
     if (dias > 0) {
       const total = dias * habitacion.precio_por_noche;
       setPrecioTotal(total);
@@ -33,133 +32,152 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
     }
   };
 
+  // ===========================================================
+  // 🧠 MANEJAR RESERVA
+  // ===========================================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Obtener usuario actual
+      // ✅ Obtener usuario actual
       const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session) {
-        alert('Debes iniciar sesión para reservar');
+        alert("Debes iniciar sesión para reservar");
         return;
       }
 
-       // Validar fechas - crear fechas en zona horaria local
-      const [yearEntrada, monthEntrada, dayEntrada] = formData.fecha_entrada.split('-').map(Number);
-      const [yearSalida, monthSalida, daySalida] = formData.fecha_salida.split('-').map(Number);
-
-      const entrada = new Date(yearEntrada, monthEntrada - 1, dayEntrada);
-      const salida = new Date(yearSalida, monthSalida - 1, daySalida);
+      // ✅ Validar fechas
+      const [yIn, mIn, dIn] = formData.fecha_entrada.split("-").map(Number);
+      const [yOut, mOut, dOut] = formData.fecha_salida.split("-").map(Number);
+      const entrada = new Date(yIn, mIn - 1, dIn);
+      const salida = new Date(yOut, mOut - 1, dOut);
       const hoy = new Date();
       hoy.setHours(0, 0, 0, 0);
 
       if (entrada < hoy) {
-        alert('La fecha de entrada no puede ser anterior a hoy');
+        alert("⚠️ La fecha de entrada no puede ser anterior a hoy");
         return;
       }
 
       if (salida <= entrada) {
-        alert('La fecha de salida debe ser posterior a la fecha de entrada');
+        alert("⚠️ La fecha de salida debe ser posterior a la fecha de entrada");
         return;
       }
 
-      // Modal q se cambie dependiendo la habitacion que quiere el huesped 
-      const { data: habitacionData } = await supabase
-        .from('habitaciones')
-        .select('id')
-        .eq('tipo', habitacion.tipo)
-        .eq('estado', 'disponible')
-        .limit(1)
-        .single();
+      // 🔹 Traer todas las habitaciones del mismo tipo
+      const { data: habitacionesTipo, error: errorHabitaciones } = await supabase
+        .from("habitaciones")
+        .select("id, tipo, estado")
+        .eq("tipo", habitacion.tipo);
 
-      if (!habitacionData) {
-        alert('No hay habitaciones disponibles de este tipo');
+      if (errorHabitaciones) throw errorHabitaciones;
+      if (!habitacionesTipo || habitacionesTipo.length === 0) {
+        alert("No existen habitaciones de este tipo en la base de datos");
         return;
       }
 
-      // Verificar disponibilidad en las fechas
-      const { data: reservasExistentes } = await supabase
-        .from('reservas')
-        .select('*')
-        .eq('habitacion_id', habitacionData.id)
-        .in('estado', ['pendiente', 'confirmada'])
-        .or(`fecha_entrada.lte.${formData.fecha_salida},fecha_salida.gte.${formData.fecha_entrada}`);
+      // 🔍 Buscar una habitación libre (sin reservas superpuestas)
+      let habitacionLibre = null;
+      const entradaNueva = new Date(formData.fecha_entrada);
+      const salidaNueva = new Date(formData.fecha_salida);
 
-      if (reservasExistentes && reservasExistentes.length > 0) {
-        alert('Lo sentimos, la habitación no está disponible en esas fechas');
+      for (const hab of habitacionesTipo) {
+        const { data: reservasExistentes, error: errorRes } = await supabase
+          .from("reservas")
+          .select("fecha_entrada, fecha_salida, estado")
+          .eq("habitacion_id", hab.id)
+          .in("estado", ["pendiente", "confirmada"]);
+
+        if (errorRes) throw errorRes;
+
+        const haySolapamiento = reservasExistentes.some((r) => {
+          const inicio = new Date(r.fecha_entrada);
+          const fin = new Date(r.fecha_salida);
+          return (
+            (entradaNueva >= inicio && entradaNueva < fin) ||
+            (salidaNueva > inicio && salidaNueva <= fin) ||
+            (entradaNueva <= inicio && salidaNueva >= fin)
+          );
+        });
+
+        if (!haySolapamiento) {
+          habitacionLibre = hab;
+          break;
+        }
+      }
+
+      // 🚫 Si no hay ninguna libre
+      if (!habitacionLibre) {
+        alert("🚫 No hay habitaciones disponibles de este tipo en esas fechas");
         return;
       }
 
-      // Crear reserva
-      const { error } = await supabase
-        .from('reservas')
-        .insert([{
+      // ✅ Crear reserva con la habitación libre encontrada
+      const { error: reservaError } = await supabase.from("reservas").insert([
+        {
           usuario_id: session.user.id,
-          habitacion_id: habitacionData.id,
+          habitacion_id: habitacionLibre.id,
           fecha_entrada: formData.fecha_entrada,
           fecha_salida: formData.fecha_salida,
           numero_huespedes: formData.numero_huespedes,
           total: precioTotal,
-          estado: 'pendiente',
-          notas: formData.notas
-        }]);
+          estado: "pendiente",
+          notas: formData.notas,
+        },
+      ]);
 
-      if (error) {
-        throw error;
+      if (reservaError) throw reservaError;
+
+      // 🏨 Marcar habitación como ocupada solo si HOY está dentro del rango
+      const hoyStr = new Date().toISOString().split("T")[0];
+      if (hoyStr >= formData.fecha_entrada && hoyStr <= formData.fecha_salida) {
+        const { error: habError } = await supabase
+          .from("habitaciones")
+          .update({ estado: "ocupada" })
+          .eq("id", habitacionLibre.id);
+        if (habError) console.error("Error al actualizar habitación:", habError);
       }
-       // Verificar si la fecha de entrada es HOY
-      const hoyStr = new Date().toISOString().split('T')[0];
-      const esHoy = formData.fecha_entrada === hoyStr;
 
-      // Solo marcar como ocupada si el check-in es HOY
-      if (esHoy) {
-        const { error: habitacionError } = await supabase
-          .from('habitaciones')
-          .update({ estado: 'ocupada' })
-          .eq('id', habitacionData.id);
-
-        if (habitacionError) {
-          console.error('Error al actualizar habitación:', habitacionError);
-        }
-      }
-      // Si el check-in es en el futuro, la habitación queda "disponible" hasta ese día
-
-      const mensaje = esHoy
-        ? '¡Reserva creada exitosamente! La habitación está ahora ocupada.'
-        : '¡Reserva creada exitosamente! La habitación se marcará como ocupada el día de tu check-in.';
+      // 🎉 Mensaje final
+      const mensaje =
+        hoyStr === formData.fecha_entrada
+          ? "✅ ¡Reserva creada exitosamente! La habitación está ahora ocupada."
+          : "✅ ¡Reserva creada exitosamente! La habitación se marcará como ocupada el día de tu check-in.";
 
       alert(mensaje);
       onSuccess();
-      
+
     } catch (error) {
-      console.error('Error al crear reserva:', error);
-      alert('Error al crear la reserva: ' + error.message);
+      console.error("Error al crear reserva:", error);
+      alert("❌ Error al crear la reserva: " + error.message);
     } finally {
       setLoading(false);
     }
   };
 
+  // ===========================================================
+  // 🖼️ RENDER DEL MODAL
+  // ===========================================================
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Reservar {habitacion?.tipo}</h2>
-        
+
         <div className="habitacion-info-box">
-          <p><strong>Tipo:</strong> {habitacion?.badge || 'Standard'}</p>
+          <p><strong>Tipo:</strong> {habitacion?.badge || "Standard"}</p>
           <p><strong>Precio por noche:</strong> ${habitacion?.precio_por_noche}</p>
           <p><strong>Capacidad:</strong> {habitacion?.capacidad} Huéspedes</p>
         </div>
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Fecha de Entrada *</label>
             <input
               type="date"
               value={formData.fecha_entrada}
-              onChange={(e) => setFormData({...formData, fecha_entrada: e.target.value})}
-              min={new Date().toISOString().split('T')[0]}
-              // esto evita fechas pasadas 
+              onChange={(e) => setFormData({ ...formData, fecha_entrada: e.target.value })}
+              min={new Date().toISOString().split("T")[0]}
               required
             />
           </div>
@@ -169,8 +187,8 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
             <input
               type="date"
               value={formData.fecha_salida}
-              onChange={(e) => setFormData({...formData, fecha_salida: e.target.value})}
-              min={formData.fecha_entrada || new Date().toISOString().split('T')[0]}
+              onChange={(e) => setFormData({ ...formData, fecha_salida: e.target.value })}
+              min={formData.fecha_entrada || new Date().toISOString().split("T")[0]}
               required
             />
           </div>
@@ -180,7 +198,9 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
             <input
               type="number"
               value={formData.numero_huespedes}
-              onChange={(e) => setFormData({...formData, numero_huespedes: parseInt(e.target.value)})}
+              onChange={(e) =>
+                setFormData({ ...formData, numero_huespedes: parseInt(e.target.value) })
+              }
               min="1"
               max={habitacion?.capacidad || 10}
               required
@@ -192,7 +212,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
             <label>Notas adicionales (opcional)</label>
             <textarea
               value={formData.notas}
-              onChange={(e) => setFormData({...formData, notas: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
               rows="3"
               placeholder="Solicitudes especiales, preferencias, etc."
             ></textarea>
@@ -202,8 +222,11 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
             <div className="precio-total-box">
               <h3>Total: ${precioTotal}</h3>
               <small>
-                {Math.ceil((new Date(formData.fecha_salida) - new Date(formData.fecha_entrada)) / (1000 * 60 * 60 * 24))} 
-                {' '}noche(s) × ${habitacion?.precio_por_noche}
+                {Math.ceil(
+                  (new Date(formData.fecha_salida) - new Date(formData.fecha_entrada)) /
+                    (1000 * 60 * 60 * 24)
+                )}{" "}
+                noche(s) × ${habitacion?.precio_por_noche}
               </small>
             </div>
           )}
@@ -213,7 +236,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
               Cancelar
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Procesando...' : 'Confirmar Reserva'}
+              {loading ? "Procesando..." : "Confirmar Reserva"}
             </button>
           </div>
         </form>
@@ -222,4 +245,4 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
   );
 }
 
-export default ModalReservaHabitacion;    
+export default ModalReservaHabitacion;
