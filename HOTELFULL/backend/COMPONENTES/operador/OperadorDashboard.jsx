@@ -74,8 +74,13 @@ function OperadorDashboard() {
 
     console.log('📅 Reservas activas encontradas:', reservasActivas);
 
-    const hoy = new Date().toISOString().split('T')[0];
-    console.log('📅 Fecha de hoy:', hoy);
+    // Obtener fecha local (sin conversión a UTC)
+    const ahora = new Date();
+    const year = ahora.getFullYear();
+    const month = String(ahora.getMonth() + 1).padStart(2, '0');
+    const day = String(ahora.getDate()).padStart(2, '0');
+    const hoy = `${year}-${month}-${day}`;
+    console.log('📅 Fecha de hoy (local):', hoy);
 
     // Calcular estado real de cada habitación
     const habitacionesConEstadoReal = (data || []).map(hab => {
@@ -503,7 +508,7 @@ const handleLiberarReserva = async (reservaId) => {
                         <small>{reserva.habitaciones?.tipo}</small>
                       </td>
                       <td>
-                        {new Date(reserva.fecha_entrada).toLocaleDateString()} - {new Date(reserva.fecha_salida).toLocaleDateString()}
+                        {reserva.fecha_entrada.split('-').reverse().join('/')} - {reserva.fecha_salida.split('-').reverse().join('/')}
                       </td>
                       <td><strong>${reserva.total}</strong></td>
                       <td>
