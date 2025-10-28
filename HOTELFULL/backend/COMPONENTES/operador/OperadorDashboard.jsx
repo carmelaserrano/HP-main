@@ -75,11 +75,12 @@ function OperadorDashboard() {
     console.log('📅 Reservas activas encontradas:', reservasActivas);
 
     // Obtener fecha local (sin conversión a UTC)
+
     const ahora = new Date();
-    const year = ahora.getFullYear();
-    const month = String(ahora.getMonth() + 1).padStart(2, '0');
-    const day = String(ahora.getDate()).padStart(2, '0');
-    const hoy = `${year}-${month}-${day}`;
+const year = ahora.getFullYear();
+const month = String(ahora.getMonth() + 1).padStart(2, '0');
+const day = String(ahora.getDate()).padStart(2, '0');
+const hoy = `${year}-${month}-${day}`;
     console.log('📅 Fecha de hoy (local):', hoy);
 
     // Calcular estado real de cada habitación

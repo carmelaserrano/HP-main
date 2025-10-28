@@ -20,33 +20,7 @@
             <h1 className="hero-title">{t('home.heroTitle')}</h1>
             <p className="hero-subtitle">{t('home.heroSubtitle')}</p>
           </div>
-
-          {/* Formulario de reservas a la derecha */}
-          <div className="booking-panel">
-            <h3 className="booking-title">{t('home.bookingTitle')}</h3>
-
-            <div className="form-group">
-              <label>{t('home.checkIn')}</label>
-              <input type="date" className="form-input" />
-            </div>
-
-            <div className="form-group">
-              <label>{t('home.checkOut')}</label>
-              <input type="date" className="form-input" />
-            </div>
-
-            <div className="form-group">
-              <label>{t('home.guests')}</label>
-              <select className="form-input">
-                <option>2 {t('home.adults')}</option>
-                <option>1 {t('home.adult')}</option>
-                <option>3 {t('home.adults')}</option>
-                <option>4+ {t('home.adults')}</option>
-              </select>
-            </div>
-
-            <button className="btn-check-availability">{t('home.checkAvailability')}</button>
-          </div>
+          
         </div>
         </div>
 

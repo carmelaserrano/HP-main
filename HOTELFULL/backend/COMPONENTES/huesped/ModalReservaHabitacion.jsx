@@ -133,6 +133,7 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
       if (reservaError) throw reservaError;
 
       // 🏨 Marcar habitación como ocupada solo si HOY está dentro del rango
+        // 🏨 Marcar habitación como ocupada solo si HOY está dentro del rango
       const hoyStr = new Date().toISOString().split("T")[0];
       if (hoyStr >= formData.fecha_entrada && hoyStr <= formData.fecha_salida) {
         const { error: habError } = await supabase
