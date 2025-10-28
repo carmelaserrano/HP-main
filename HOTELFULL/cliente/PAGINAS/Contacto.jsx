@@ -74,7 +74,7 @@ function Contacto() {
                   type="email"
                   name="from_email"
                   placeholder={t('contacto.emailPlaceholder')}
-                  pattern='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\'
+                  pattern='^[^\s@]+@[^\s@]+\.[^\s@]+$'
                   title='El email debe tener un formato válido'
                   required
                 />

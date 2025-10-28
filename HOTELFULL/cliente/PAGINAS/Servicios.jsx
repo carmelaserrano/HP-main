@@ -53,9 +53,28 @@ const Servicios = () => {
   };
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Validación en tiempo real para nombre (solo letras y espacios)
+    if (name === 'nombre') {
+      if (value === '' || /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+      return;
+    }
+
+    // Validación en tiempo real para teléfono (solo números, espacios, guiones y paréntesis)
+    if (name === 'telefono') {
+      if (value === '' || /^[\d\s\-()]+$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
+      return;
+    }
+
+    // Para otros campos, actualizar normalmente
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
@@ -63,6 +82,30 @@ const Servicios = () => {
     e.preventDefault();
     setSending(true);
     setMessage('');
+
+    // Validar nombre (solo letras y espacios)
+    const nombreRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+    if (!nombreRegex.test(formData.nombre)) {
+      setMessage('El nombre solo puede contener letras y espacios');
+      setSending(false);
+      return;
+    }
+
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage('Por favor, ingresa un correo electrónico válido');
+      setSending(false);
+      return;
+    }
+
+    // Validar teléfono (solo números, espacios, guiones y paréntesis)
+    const telefonoRegex = /^[\d\s\-()]+$/;
+    if (!telefonoRegex.test(formData.telefono)) {
+      setMessage('El teléfono solo puede contener números, espacios, guiones y paréntesis');
+      setSending(false);
+      return;
+    }
 
 
     // Cuando haces clic en "Gimnasio Premium", se guarda en selectedService, y luego cuando envías el formulario, selectedService.titulo toma ese valor ("Gimnasio Premium") y lo incluye en los datos que se envían por EmailJS.

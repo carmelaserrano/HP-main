@@ -87,7 +87,12 @@ function ModalReservaServicio({ onClose, onSuccess, reservaId }) {
 
   const handleCantidadChange = (servicioId, nuevaCantidad) => {
     const servicio = servicios.find(s => s.id === servicioId);
-    const cantidadNum = parseInt(nuevaCantidad) || 1;
+    const cantidadNum = parseInt(nuevaCantidad);
+
+    // Validar que sea un número válido y mayor a 0
+    if (isNaN(cantidadNum) || cantidadNum < 1) {
+      return;
+    }
 
     // Si el servicio tiene capacidad limitada, validar
     if (servicio && servicio.cuposDisponibles !== -1) {

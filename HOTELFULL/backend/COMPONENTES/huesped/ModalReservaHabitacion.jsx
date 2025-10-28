@@ -202,9 +202,15 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
             <input
               type="number"
               value={formData.numero_huespedes}
-              onChange={(e) =>
-                setFormData({ ...formData, numero_huespedes: parseInt(e.target.value) })
-              }
+              onChange={(e) => {
+                const value = parseInt(e.target.value);
+                // Validar que esté entre 1 y la capacidad máxima
+                if (!isNaN(value) && value >= 1 && value <= (habitacion?.capacidad || 10)) {
+                  setFormData({ ...formData, numero_huespedes: value });
+                } else if (e.target.value === '') {
+                  setFormData({ ...formData, numero_huespedes: 1 });
+                }
+              }}
               min="1"
               max={habitacion?.capacidad || 10}
               required

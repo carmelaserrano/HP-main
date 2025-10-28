@@ -27,6 +27,29 @@ function Registro() {
         return;
       }
 
+      // Validar que nombre solo contenga letras y espacios
+      const nombreRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+      if (!nombreRegex.test(nombre)) {
+        setError('El nombre solo puede contener letras y espacios');
+        setLoading(false);
+        return;
+      }
+
+      // Validar que apellido solo contenga letras y espacios
+      if (!nombreRegex.test(apellido)) {
+        setError('El apellido solo puede contener letras y espacios');
+        setLoading(false);
+        return;
+      }
+
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError('Por favor, ingresa un correo electrónico válido');
+        setLoading(false);
+        return;
+      }
+
       if (password.length < 6) {
         setError('La contraseña debe tener al menos 6 caracteres');
         setLoading(false);
@@ -119,7 +142,13 @@ function Registro() {
               id="nombre"
               placeholder="Tu nombre"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Solo permitir letras y espacios
+                if (value === '' || /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(value)) {
+                  setNombre(value);
+                }
+              }}
               disabled={loading}
             />
           </div>
@@ -131,7 +160,13 @@ function Registro() {
               id="apellido"
               placeholder="Tu apellido"
               value={apellido}
-              onChange={(e) => setApellido(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Solo permitir letras y espacios
+                if (value === '' || /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(value)) {
+                  setApellido(value);
+                }
+              }}
               disabled={loading}
             />
           </div>

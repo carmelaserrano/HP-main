@@ -27,6 +27,14 @@ function Login() {
         return;
       }
 
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError('Por favor, ingresa un correo electrónico válido');
+        setLoading(false);
+        return;
+      }
+
       // Autenticación con Supabase
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: email,

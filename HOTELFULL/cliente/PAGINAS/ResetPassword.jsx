@@ -37,7 +37,15 @@ function ResetPassword() {
       }
 
       if (password.length < 6) {
-        setError('La contraseña debe tener al menos 6 caracteres');
+        setError('La contraseña debe tener al menos 6 caracteres con 1 letra ');
+        setLoading(false);
+        return;
+      }
+
+      // Validar contraseña fuerte (al menos una letra y un número)
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+      if (!passwordRegex.test(password)) {
+        setError('La contraseña debe contener al menos una letra y un número');
         setLoading(false);
         return;
       }
@@ -54,10 +62,32 @@ function ResetPassword() {
       });
 
       if (updateError) {
-        setError('Error al actualizar la contraseña: ' + updateError.message);
+        // Traducir errores comunes de Supabase al español
+        let mensajeError = 'Error al actualizar la contraseña';
+
+        if (updateError.message.includes('same as the old password')) {
+          mensajeError = 'La nueva contraseña no puede ser igual a la anterior';
+
+          // Supabase envía error en INGLÉS. El código BUSCA esa frase en inglés:
+//    if (updateError.message.includes('Password should be at least'))
+   
+// 3. Si la encuentra, MUESTRA el mensaje en ESPAÑOL al usuario:
+//    mensajeError = 'La contraseña debe tener al menos 6 caracteres'
+        } else if (updateError.message.includes('Password should be at least')) {
+          mensajeError = 'La contraseña debe tener al menos 6 caracteres';
+        } else if (updateError.message.includes('weak')) {
+          mensajeError = 'La contraseña es demasiado débil';
+        } else {
+          mensajeError = 'Error al actualizar la contraseña: ' + updateError.message;
+        }
+
+        setError(mensajeError);
         setLoading(false);
         return;
       }
+
+      // Cerrar sesión después de cambiar contraseña
+      await supabase.auth.signOut();
 
       alert('¡Contraseña actualizada con éxito! Ahora puedes iniciar sesión.');
       navigate('/login');
@@ -139,7 +169,7 @@ function ResetPassword() {
               <>
                 <span className="spinner"></span>
                 Actualizando...
-                
+
               </>
             ) : (
               'Cambiar Contraseña'

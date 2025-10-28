@@ -75,7 +75,7 @@ function RecuperarPassword() {
           <div className="form-group">
             <label htmlFor="email">Correo Electrónico</label>
             <div className="input-wrapper">
-              <span className="input-icon">📧</span>
+              <span className="input-icon"></span>
               <input
                 type="email"
                 id="email"
