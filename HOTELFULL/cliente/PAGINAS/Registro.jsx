@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../SERVICIOS/supabaseClient';
 import '../ESTILOS/Registro.css';
 import PageTransition from '../COMPONENTES/PageTransition.jsx'
-
+import { useTranslation } from 'react-i18next'
 function Registro() {
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
@@ -13,6 +13,7 @@ function Registro() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +23,7 @@ function Registro() {
     try {
       // Validacion basica
       if (!nombre || !apellido || !email || !password || !confirmPassword) {
-        setError('Por favor, completa todos los campos');
+        setError(t('registro.campos'));
         setLoading(false);
         return;
       }
@@ -30,14 +31,14 @@ function Registro() {
       // Validar que nombre solo contenga letras y espacios
       const nombreRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
       if (!nombreRegex.test(nombre)) {
-        setError('El nombre solo puede contener letras y espacios');
+        setError(t('registro.nombre'));
         setLoading(false);
         return;
       }
 
       // Validar que apellido solo contenga letras y espacios
       if (!nombreRegex.test(apellido)) {
-        setError('El apellido solo puede contener letras y espacios');
+        setError(t('registro.apellido'));
         setLoading(false);
         return;
       }
@@ -45,19 +46,19 @@ function Registro() {
       // Validar formato de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        setError('Por favor, ingresa un correo electrónico válido');
+        setError(t('registro.correo'));
         setLoading(false);
         return;
       }
 
       if (password.length < 6) {
-        setError('La contraseña debe tener al menos 6 caracteres');
+        setError(t('registro.contra'));
         setLoading(false);
         return;
       }
 
       if (password !== confirmPassword) {
-        setError('Las contraseñas no coinciden');
+        setError(t('registro.error'));
         setLoading(false);
         return;
       }
@@ -69,7 +70,7 @@ function Registro() {
       });
 
       if (signUpError) {
-        setError('Error al crear la cuenta: ' + signUpError.message);
+        setError(t('registro.error2') + signUpError.message);
         setLoading(false);
         return;
       }
@@ -86,7 +87,7 @@ function Registro() {
       ]);
 
       if (insertError) {
-        setError('Error al guardar la información del usuario');
+        setError(t('registro.error3'));
         setLoading(false);
         return;
       }
@@ -94,7 +95,7 @@ function Registro() {
       // Verificar si hay una reserva pendiente
       const pendingReservation = localStorage.getItem('pendingReservation');
 
-      alert('Registro exitoso! Bienvenido.');
+      alert(t('registro.reg'));
 
       // Si hay reserva pendiente, ir al dashboard con los datos de reserva
       if (pendingReservation) {
@@ -104,8 +105,8 @@ function Registro() {
         navigate('/huesped/dashboard');
       }
     } catch (err) {
-      setError('Ocurrió un error inesperado. Por favor, intenta de nuevo.');
-      console.error('Error de registro:', err);
+      setError(t('registro.error4'));
+      console.error((t('registro.error5')), err);
     } finally {
       setLoading(false);
     }
@@ -120,12 +121,12 @@ function Registro() {
           className="btn-back"
           type="button"
         >
-          ← Volver al inicio
+          ← {t('registro.title')}
         </button>
 
         <div className="registro-header">
-          <h1>Crear Cuenta</h1>
-          <p>Registrate para hacer reservas</p>
+          <h1>{t('registro.h1')}</h1>
+          <p>{t('registro.registro')}</p>
         </div>
 
         <form className="registro-form" onSubmit={handleSubmit}>
@@ -136,11 +137,11 @@ function Registro() {
           )}
 
           <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
+            <label htmlFor="nombre">{t('registro.name')}</label>
             <input
               type="text"
               id="nombre"
-              placeholder="Tu nombre"
+              placeholder={t('registro.place1')}
               value={nombre}
               onChange={(e) => {
                 const value = e.target.value;
@@ -154,11 +155,11 @@ function Registro() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="apellido">Apellido</label>
+            <label htmlFor="apellido">{t('registro.lastname')}</label>
             <input
               type="text"
               id="apellido"
-              placeholder="Tu apellido"
+              placeholder={t('registro.place2')}
               value={apellido}
               onChange={(e) => {
                 const value = e.target.value;
@@ -172,11 +173,11 @@ function Registro() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Correo Electronico</label>
+            <label htmlFor="email">{t('registro.email')}</label>
             <input
               type="email"
               id="email"
-              placeholder="tu@email.com"
+              placeholder={t('registro.place3')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
@@ -184,11 +185,11 @@ function Registro() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
+            <label htmlFor="password">{t('registro.password')}</label>
             <input
               type="password"
               id="password"
-              placeholder="Minimo 6 caracteres"
+              placeholder={t('registro.place4')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
@@ -196,11 +197,11 @@ function Registro() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+            <label htmlFor="confirmPassword">{t('registro.confirm')}</label>
             <input
               type="password"
               id="confirmPassword"
-              placeholder="Repite tu contraseña"
+              placeholder={t('registro.place5')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
@@ -212,7 +213,7 @@ function Registro() {
           </button>
 
           <div className="login-link">
-            ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
+            {t('registro.login')}<Link to="/login">{t('registro.sesion')}</Link>
           </div>
         </form>
       </div>
