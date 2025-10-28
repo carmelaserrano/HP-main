@@ -17,10 +17,12 @@
         <div className="hero-content">
           {/* Texto a la izquierda */}
           <div className="hero-text">
+            <div className="hero-decoration-line"></div>
             <h1 className="hero-title">{t('home.heroTitle')}</h1>
+            <div className="hero-title-underline"></div>
             <p className="hero-subtitle">{t('home.heroSubtitle')}</p>
           </div>
-          
+
         </div>
         </div>
 
