@@ -30,7 +30,7 @@ function Login() {
       // Validar formato de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        setError('Por favor, ingresa un correo electrónico válido');
+        setError(t('login.correo'));
         setLoading(false);
         return;
       }

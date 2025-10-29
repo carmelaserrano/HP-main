@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../SERVICIOS/supabaseClient';
 import '../ESTILOS/ResetPassword.css';
-
+import { useTranslation } from 'react-i18next'
 function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -11,13 +11,14 @@ function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Verificar si el usuario llegó desde el link del correo
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setError('Sesión inválida o expirada. Por favor, solicita un nuevo enlace de recuperación.');
+        setError(t('resetpwd.text1'));
       }
     };
     checkSession();
@@ -31,13 +32,13 @@ function ResetPassword() {
     try {
       // Validación básica
       if (!password || !confirmPassword) {
-        setError('Por favor, completa todos los campos');
+        setError(t('resetpwd.text2'));
         setLoading(false);
         return;
       }
 
       if (password.length < 6) {
-        setError('La contraseña debe tener al menos 6 caracteres con 1 letra ');
+        setError(t('resetpwd.text3'));
         setLoading(false);
         return;
       }
@@ -45,13 +46,13 @@ function ResetPassword() {
       // Validar contraseña fuerte (al menos una letra y un número)
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
       if (!passwordRegex.test(password)) {
-        setError('La contraseña debe contener al menos una letra y un número');
+        setError(t('resetpwd.text4'));
         setLoading(false);
         return;
       }
 
       if (password !== confirmPassword) {
-        setError('Las contraseñas no coinciden');
+        setError(t('resetpwd.text5'));
         setLoading(false);
         return;
       }
@@ -63,10 +64,10 @@ function ResetPassword() {
 
       if (updateError) {
         // Traducir errores comunes de Supabase al español
-        let mensajeError = 'Error al actualizar la contraseña';
+        let mensajeError = t('resetpwd.title1');
 
         if (updateError.message.includes('same as the old password')) {
-          mensajeError = 'La nueva contraseña no puede ser igual a la anterior';
+          mensajeError =  t('resetpwd.title2');
 
           // Supabase envía error en INGLÉS. El código BUSCA esa frase en inglés:
 //    if (updateError.message.includes('Password should be at least'))
@@ -74,11 +75,11 @@ function ResetPassword() {
 // 3. Si la encuentra, MUESTRA el mensaje en ESPAÑOL al usuario:
 //    mensajeError = 'La contraseña debe tener al menos 6 caracteres'
         } else if (updateError.message.includes('Password should be at least')) {
-          mensajeError = 'La contraseña debe tener al menos 6 caracteres';
+          mensajeError = t('resetpwd.title3');
         } else if (updateError.message.includes('weak')) {
-          mensajeError = 'La contraseña es demasiado débil';
+          mensajeError = t('resetpwd.title4');
         } else {
-          mensajeError = 'Error al actualizar la contraseña: ' + updateError.message;
+          mensajeError =  t('resetpwd.title5') + updateError.message;
         }
 
         setError(mensajeError);
@@ -89,11 +90,11 @@ function ResetPassword() {
       // Cerrar sesión después de cambiar contraseña
       await supabase.auth.signOut();
 
-      alert('¡Contraseña actualizada con éxito! Ahora puedes iniciar sesión.');
+      alert(t('resetpwd.alert1'));
       navigate('/login');
     } catch (err) {
-      setError('Ocurrió un error inesperado. Por favor, intenta de nuevo.');
-      console.error('Error al resetear contraseña:', err);
+      setError(t('resetpwd.alert2'));
+      console.error(t('resetpwd.alert3'), err);
     } finally {
       setLoading(false);
     }
@@ -103,8 +104,8 @@ function ResetPassword() {
     <div className="reset-page">
       <div className="reset-container">
         <div className="reset-header">
-          <h1>Nueva Contraseña</h1>
-          <p>Ingresa tu nueva contraseña</p>
+          <h1>{t('resetpwd.title')}</h1>
+          <p>{t('resetpwd.subtitle')}</p>
         </div>
 
         <form className="reset-form" onSubmit={handleSubmit}>
@@ -115,14 +116,14 @@ function ResetPassword() {
           )}
 
           <div className="form-group">
-            <label htmlFor="password">Nueva Contraseña</label>
+            <label htmlFor="password">{t('resetpwd.newpwd')}</label>
             <div className="input-wrapper">
               
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
-                placeholder="Mínimo 6 caracteres"
+                placeholder={t('resetpwd.placeholder1')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
@@ -140,14 +141,14 @@ function ResetPassword() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+            <label htmlFor="confirmPassword">{t('resetpwd.confirmpwd')}</label>
             <div className="input-wrapper">
               
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
                 name="confirmPassword"
-                placeholder="Repite tu contraseña"
+                placeholder={t('resetpwd.placeholder2')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={loading}
@@ -168,11 +169,11 @@ function ResetPassword() {
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Actualizando...
+                {t('resetpwd.act')}
 
               </>
             ) : (
-              'Cambiar Contraseña'
+              t('resetpwd.actualizar')
             )}
           </button>
         </form>

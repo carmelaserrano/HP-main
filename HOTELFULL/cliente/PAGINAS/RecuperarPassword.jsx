@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../SERVICIOS/supabaseClient';
 import '../ESTILOS/RecuperarPassword.css';
+import { useTranslation } from 'react-i18next'
 
 function RecuperarPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
+  const { t } = useTranslation();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -18,14 +19,14 @@ function RecuperarPassword() {
     try {
       // Validación básica
       if (!email) {
-        setError('Por favor, ingresa tu correo electrónico');
+        setError(t('recupwd.text1'));
         setLoading(false);
         return;
       }
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        setError('Por favor, ingresa un correo electrónico válido');
+        setError(t('recupwd.text2'));
         setLoading(false);
         return;
       }
@@ -36,16 +37,16 @@ function RecuperarPassword() {
       });
 
       if (resetError) {
-        setError('Error al enviar el correo: ' + resetError.message);
+        setError(t('recupwd.text3') + resetError.message);
         setLoading(false);
         return;
       }
 
-      setMessage('¡Correo enviado! Revisa tu bandeja de entrada para restablecer tu contraseña.');
+      setMessage(t('recupwd.text4'));
       setEmail('');
     } catch (err) {
-      setError('Ocurrió un error inesperado. Por favor, intenta de nuevo.');
-      console.error('Error de recuperación:', err);
+      setError(t('recupwd.text5'));
+      console.error(t('recupwd.text6'), err);
     } finally {
       setLoading(false);
     }
@@ -55,8 +56,8 @@ function RecuperarPassword() {
     <div className="recuperar-page">
       <div className="recuperar-container">
         <div className="recuperar-header">
-          <h1>Recuperar Contraseña</h1>
-          <p>Ingresa tu correo para recibir las instrucciones</p>
+          <h1>{t('recupwd.title1')}</h1>
+          <p>{t('recupwd.title2')}</p>
         </div>
 
         <form className="recuperar-form" onSubmit={handleSubmit}>
@@ -73,14 +74,14 @@ function RecuperarPassword() {
           )}
 
           <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
+            <label htmlFor="email">{t('recupwd.email')}</label>
             <div className="input-wrapper">
               <span className="input-icon"></span>
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="tu@email.com"
+                placeholder={t('recupwd.tumail')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
@@ -93,15 +94,16 @@ function RecuperarPassword() {
             {loading ? (
               <>
                 <span className="spinner"></span>
-                Enviando...
+                t('recupwd.send')
               </>
             ) : (
-              'Enviar Correo'
+              t('recupwd.enviar')
             )}
           </button>
 
           <div className="login-link">
-            ¿Recordaste tu contraseña? <Link to="/login">Inicia sesión aquí</Link>
+            {t('recupwd.recordar')}
+            <Link to="/login">{t('recupwd.sesion')}</Link>
           </div>
         </form>
       </div>
