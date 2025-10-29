@@ -38,6 +38,20 @@ const Servicios = () => {
     checkUser();
   }, []);
 
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (selectedService) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup al desmontar
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedService]);
+
   const handleReservarClick = async () => {
     // Verificar si está logueado
     const { data: { session } } = await supabase.auth.getSession();

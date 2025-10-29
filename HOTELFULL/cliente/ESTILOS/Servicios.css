@@ -110,19 +110,21 @@
 
 /* Modal */
 .modal {
-  position: fixed;
+  position: center;
   top: 0;
   left: 0;
   right: 0;
-  margin-bottom: 30%;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  /*z-index: 9999;
-  /*animation: fadeIn 0.3s ease; esto me permitio que cuando abra las tarjetas no salga cortada  */
 
+  /* esto es lo que me permitio que no haya scrolla fuera sino que solo de la card de servicioss */
+  align-items: flex-start;
+  justify-content: center;
+  padding: 240px 20px;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -137,17 +139,11 @@
 .modal-content {
   background: white;
   border-radius: 15px;
-  max-width: 500px;
-  width: 100%;
+  max-width: 300px;
   padding-bottom: 20px;
-  /*max-height: 90vh;*/
-  max-height: calc(100vh - 100px);
   overflow-y: auto;
-  position: relative;
   animation: slideUp 0.3s ease;
-  margin: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  margin-top: 15%;
 }
 
 .close-btn {
@@ -237,7 +233,6 @@
 /* Formulario de Reserva */
 .reserva-form {
   padding: 20px 30px 30px;
-  margin-bottom: 30%;
 }
 
 .form-group {
