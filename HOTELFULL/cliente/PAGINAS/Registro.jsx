@@ -69,24 +69,66 @@ function Registro() {
       });
 
       if (signUpError) {
-        setError('Error al crear la cuenta: ' + signUpError.message);
+        console.error('Error de Supabase auth:', signUpError);
+
+        // Traducir errores comunes de autenticación al español
+        let mensajeError = 'Error al crear la cuenta';
+
+        if (signUpError.message.includes('User already registered') ||
+            signUpError.message.includes('already registered')) {
+          mensajeError = 'Este correo electrónico ya está registrado. Por favor, inicia sesión.';
+        } else if (signUpError.message.includes('Password should be at least')) {
+          mensajeError = 'La contraseña debe tener al menos 6 caracteres';
+        } else if (signUpError.message.includes('Invalid email')) {
+          mensajeError = 'El correo electrónico no es válido';
+        } else if (signUpError.message.includes('Email rate limit exceeded')) {
+          mensajeError = 'Demasiados intentos. Por favor, espera unos minutos e intenta de nuevo.';
+        } else if (signUpError.message.includes('weak password')) {
+          mensajeError = 'La contraseña es demasiado débil';
+        } else {
+          mensajeError = `Error al crear la cuenta: ${signUpError.message}`;
+        }
+
+        setError(mensajeError);
         setLoading(false);
         return;
       }
 
       // Guardar información adicional del usuario
-      const { error: insertError } = await supabase.from('profiles').insert([
-        {
-          id: data.user.id,
-          nombre: nombre,
-          apellido: apellido,
-          email: email,
-          rol: 'huesped',
-        },
-      ]);
+      // Usar upsert para actualizar si ya existe (por si hay un trigger automático)
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: data.user.id,
+            nombre: nombre,
+            apellido: apellido,
+            email: email,
+            rol: 'huesped',
+            activo: true
+          },
+          { onConflict: 'id' }
+        );
 
       if (insertError) {
-        setError('Error al guardar la información del usuario');
+        console.error('Error detallado de Supabase:', insertError);
+
+        // Traducir errores comunes al español
+        let mensajeError = 'Error al guardar la información del usuario';
+
+        if (insertError.message.includes('duplicate key')) {
+          mensajeError = 'Este usuario ya existe en el sistema';
+        } else if (insertError.message.includes('violates foreign key')) {
+          mensajeError = 'Error de referencia en la base de datos';
+        } else if (insertError.message.includes('null value')) {
+          mensajeError = 'Falta información requerida en el perfil';
+        } else if (insertError.code === '23505') {
+          mensajeError = 'Este email ya está registrado';
+        } else {
+          mensajeError = `Error: ${insertError.message}`;
+        }
+
+        setError(mensajeError);
         setLoading(false);
         return;
       }

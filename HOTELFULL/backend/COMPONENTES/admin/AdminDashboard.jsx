@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../cliente/SERVICIOS/supabaseClient.jsx';
 import { useNavigate } from 'react-router-dom';
 import '../../ESTILOS/DashboardStyles.css';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -17,6 +17,7 @@ function AdminDashboard() {
     reservasConfirmadas: 0,
     ingresoTotal: 0
   });
+  const [ingresosPorMes, setIngresosPorMes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [habitaciones, setHabitaciones] = useState([]);
@@ -122,9 +123,48 @@ function AdminDashboard() {
         reservasConfirmadas: confirmadas,
         ingresoTotal: ingreso
       }));
+
+      // Calcular ingresos reales por mes
+      calcularIngresosPorMes(data || []);
     } else {
       console.error('Error al cargar reservas:', error);
     }
+  };
+
+  const calcularIngresosPorMes = (reservas) => {
+    const mesesNombres = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const añoActual = new Date().getFullYear();
+
+    // Crear objeto para almacenar ingresos por mes
+    const ingresosPorMesObj = {};
+
+    // Inicializar todos los meses en 0
+    mesesNombres.forEach((mes, index) => {
+      ingresosPorMesObj[index] = { mes, ingresos: 0 };
+    });
+
+    // Sumar los ingresos de cada reserva al mes correspondiente
+    reservas.forEach(reserva => {
+      const fechaEntrada = new Date(reserva.fecha_entrada);
+      const mes = fechaEntrada.getMonth();
+      const año = fechaEntrada.getFullYear();
+
+      // Solo contar reservas del año actual
+      if (año === añoActual) {
+        ingresosPorMesObj[mes].ingresos += parseFloat(reserva.total) || 0;
+      }
+    });
+
+    // Convertir a array y tomar solo los últimos 7 meses
+    const mesActual = new Date().getMonth();
+    const ingresosFiltrados = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const mesIndex = (mesActual - i + 12) % 12;
+      ingresosFiltrados.push(ingresosPorMesObj[mesIndex]);
+    }
+
+    setIngresosPorMes(ingresosFiltrados);
   };
 
   const handleToggleHabitacion = async (id, currentEstado) => {
@@ -260,92 +300,70 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* Gráfico de Torta con Recharts */}
-            <div className="dashboard-card chart-card">
-              <h2>Estado de Habitaciones</h2>
-              <div className="pie-chart-simple">
-                <ResponsiveContainer width="100%" height={350}>
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Disponibles', value: stats.habitacionesDisponibles },
-                        { name: 'Ocupadas', value: stats.habitacionesOcupadas },
-                        { name: 'Mantenimiento', value: stats.totalHabitaciones - stats.habitacionesDisponibles - stats.habitacionesOcupadas }
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
+            {/* Contenedor de gráficos lado a lado */}
+            <div className="charts-container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginTop: '30px' }}>
+
+              {/* Gráfico de Torta - Estado de Habitaciones */}
+              <div className="dashboard-card chart-card">
+                <h2>Estado de Habitaciones</h2>
+                <div className="pie-chart-simple">
+                  <ResponsiveContainer width="100%" height={350}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Disponibles', value: stats.habitacionesDisponibles },
+                          { name: 'Ocupadas', value: stats.habitacionesOcupadas },
+                          { name: 'Mantenimiento', value: stats.totalHabitaciones - stats.habitacionesDisponibles - stats.habitacionesOcupadas }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        <Cell fill="#28a745" />
+                        <Cell fill="#dc3545" />
+                        <Cell fill="#ffc107" />
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Gráfico de Barras - Ingresos Reales por Mes */}
+              <div className="dashboard-card chart-card">
+                <h2>Ingresos Mensuales Reales ($)</h2>
+                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '-10px', marginBottom: '15px' }}>
+                  Últimos 7 meses del año {new Date().getFullYear()}
+                </p>
+                <div className="bar-chart-container">
+                  <ResponsiveContainer width="100%" height={350}>
+                    <BarChart
+                      data={ingresosPorMes}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
-                      <Cell fill="#28a745" />
-                      <Cell fill="#dc3545" />
-                      <Cell fill="#ffc107" />
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E0" />
+                      <XAxis dataKey="mes" stroke="#77878B" />
+                      <YAxis stroke="#77878B" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #E8E8E0',
+                          borderRadius: '8px'
+                        }}
+                        formatter={(value) => `$${value.toFixed(2)}`}
+                      />
+                      <Legend />
+                      <Bar dataKey="ingresos" fill="#F4B860" name="Ingresos" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
-            </div>
 
-            {/* Gráfico de Ocupación Semanal */}
-            <div className="dashboard-card chart-card">
-              <h2>Tendencia de Ocupación Semanal</h2>
-              <div className="line-chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={[
-                      { dia: 'Lun', ocupadas: stats.habitacionesOcupadas * 0.7, disponibles: stats.habitacionesDisponibles * 1.3 },
-                      { dia: 'Mar', ocupadas: stats.habitacionesOcupadas * 0.8, disponibles: stats.habitacionesDisponibles * 1.2 },
-                      { dia: 'Mié', ocupadas: stats.habitacionesOcupadas * 0.85, disponibles: stats.habitacionesDisponibles * 1.15 },
-                      { dia: 'Jue', ocupadas: stats.habitacionesOcupadas * 0.9, disponibles: stats.habitacionesDisponibles * 1.1 },
-                      { dia: 'Vie', ocupadas: stats.habitacionesOcupadas, disponibles: stats.habitacionesDisponibles },
-                      { dia: 'Sáb', ocupadas: stats.habitacionesOcupadas * 1.2, disponibles: stats.habitacionesDisponibles * 0.8 },
-                      { dia: 'Dom', ocupadas: stats.habitacionesOcupadas * 1.1, disponibles: stats.habitacionesDisponibles * 0.9 }
-                    ]}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E0" />
-                    <XAxis dataKey="dia" stroke="#77878B" />
-                    <YAxis stroke="#77878B" />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E8E0', borderRadius: '8px' }} />
-                    <Legend />
-                    <Line type="monotone" dataKey="ocupadas" stroke="#F44336" strokeWidth={2} name="Ocupadas" />
-                    <Line type="monotone" dataKey="disponibles" stroke="#4CAF50" strokeWidth={2} name="Disponibles" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Gráfico de Ingresos Mensuales */}
-            <div className="dashboard-card chart-card">
-              <h2>Proyección de Ingresos Mensuales</h2>
-              <div className="line-chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={[
-                      { mes: 'Ene', ingresos: stats.ingresoTotal * 0.7 },
-                      { mes: 'Feb', ingresos: stats.ingresoTotal * 0.75 },
-                      { mes: 'Mar', ingresos: stats.ingresoTotal * 0.85 },
-                      { mes: 'Abr', ingresos: stats.ingresoTotal * 0.9 },
-                      { mes: 'May', ingresos: stats.ingresoTotal },
-                      { mes: 'Jun', ingresos: stats.ingresoTotal * 1.1 },
-                      { mes: 'Jul', ingresos: stats.ingresoTotal * 1.3 }
-                    ]}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E8E0" />
-                    <XAxis dataKey="mes" stroke="#77878B" />
-                    <YAxis stroke="#77878B" />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E8E0', borderRadius: '8px' }} />
-                    <Legend />
-                    <Line type="monotone" dataKey="ingresos" stroke="#F4B860" strokeWidth={3} name="Ingresos ($)" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
             </div>
           </>
         )}

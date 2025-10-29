@@ -132,24 +132,13 @@ function ModalReservaHabitacion({ onClose, onSuccess, habitacion }) {
 
       if (reservaError) throw reservaError;
 
-      // 🏨 Marcar habitación como ocupada solo si HOY está dentro del rango
-        // 🏨 Marcar habitación como ocupada solo si HOY está dentro del rango
-      const hoyStr = new Date().toISOString().split("T")[0];
-      if (hoyStr >= formData.fecha_entrada && hoyStr <= formData.fecha_salida) {
-        const { error: habError } = await supabase
-          .from("habitaciones")
-          .update({ estado: "ocupada" })
-          .eq("id", habitacionLibre.id);
-        if (habError) console.error("Error al actualizar habitación:", habError);
-      }
+      // 🏨 NO actualizar el estado en la base de datos
+      // El dashboard del operador calcula el estado en tiempo real basándose en las fechas de reservas
+      // Esto permite que las habitaciones con reservas futuras sigan apareciendo como disponibles
+      console.log('✅ Reserva creada. El estado se calculará automáticamente en el dashboard.');
 
       // 🎉 Mensaje final
-      const mensaje =
-        hoyStr === formData.fecha_entrada
-          ? "✅ ¡Reserva creada exitosamente! La habitación está ahora ocupada."
-          : "✅ ¡Reserva creada exitosamente! La habitación se marcará como ocupada el día de tu check-in.";
-
-      alert(mensaje);
+      alert("✅ ¡Reserva creada exitosamente!");
       onSuccess();
 
     } catch (error) {

@@ -118,6 +118,22 @@ const hoy = `${year}-${month}-${day}`;
         });
       }
 
+      // 🔄 Actualizar el estado en la base de datos si cambió
+      if (estadoFinal !== hab.estado) {
+        console.log(`🔄 Actualizando habitación ${hab.numero} de "${hab.estado}" a "${estadoFinal}"`);
+        supabase
+          .from('habitaciones')
+          .update({ estado: estadoFinal })
+          .eq('id', hab.id)
+          .then(({ error }) => {
+            if (error) {
+              console.error(`❌ Error al actualizar habitación ${hab.numero}:`, error);
+            } else {
+              console.log(`✅ Habitación ${hab.numero} actualizada a "${estadoFinal}"`);
+            }
+          });
+      }
+
       return {
         ...hab,
         estadoReal: estadoFinal

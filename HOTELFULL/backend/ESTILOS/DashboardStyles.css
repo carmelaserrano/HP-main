@@ -1027,4 +1027,14 @@
   .action-btn i {
     font-size: 2rem;
   }
+
+  /* Gráficos responsivos */
+  .charts-container {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .chart-card h2 {
+    font-size: 1.3rem;
+  }
 }
