@@ -47,8 +47,8 @@ const Servicios = () => {
         const serviciosMapeados = data.map((serv, index) => ({
           id: serv.id,
           titulo: serv.nombre,
-          descripcion: serv.descripcion || 'Servicio premium disponible',
-          detalles: serv.descripcion || 'Consulta por más detalles',
+          descripcion: serv.descripcion || t('servicios.defaultDescription'),
+          detalles: serv.descripcion || t('servicios.defaultDetails'),
           precio: serv.precio,
           // Usar la primera imagen del servicio si existe, sino usar Unsplash
           imagen: serv.imagenes && serv.imagenes.length > 0
@@ -58,7 +58,7 @@ const Servicios = () => {
 
         setServicios(serviciosMapeados);
       } catch (error) {
-        console.error('Error al cargar servicios:', error);
+        console.error(t('servicios.errorLoading'), error);
       } finally {
         setLoading(false);
       }
@@ -151,7 +151,7 @@ const Servicios = () => {
     // Validar nombre (solo letras y espacios)
     const nombreRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
     if (!nombreRegex.test(formData.nombre)) {
-      setMessage('El nombre solo puede contener letras y espacios');
+      setMessage(t('servicios.errorName'));
       setSending(false);
       return;
     }
@@ -159,7 +159,7 @@ const Servicios = () => {
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setMessage('Por favor, ingresa un correo electrónico válido');
+      setMessage(t('servicios.errorEmail'));
       setSending(false);
       return;
     }
@@ -167,7 +167,7 @@ const Servicios = () => {
     // Validar teléfono (solo números, espacios, guiones y paréntesis)
     const telefonoRegex = /^[\d\s\-()]+$/;
     if (!telefonoRegex.test(formData.telefono)) {
-      setMessage('El teléfono solo puede contener números, espacios, guiones y paréntesis');
+      setMessage(t('servicios.errorPhone'));
       setSending(false);
       return;
     }
@@ -194,13 +194,13 @@ const Servicios = () => {
 
       if (reservaError) {
         console.error('Error al guardar reserva:', reservaError);
-        setMessage('Error al crear la reserva. Por favor intenta nuevamente.');
+        setMessage(t('servicios.errorCreate'));
         setSending(false);
         return;
       }
 
       // Mostrar mensaje de éxito
-      setMessage('¡Reserva creada exitosamente! Te contactaremos pronto.');
+      setMessage(t('servicios.success'));
 
       // Limpiar formulario
       setFormData({
@@ -221,7 +221,7 @@ const Servicios = () => {
 
     } catch (error) {
       console.error('Error completo:', error);
-      setMessage('Error al crear la reserva. Por favor intenta nuevamente.');
+      setMessage(t('servicios.errorCreate'));
     } finally {
       setSending(false);
     }
@@ -237,11 +237,11 @@ const Servicios = () => {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '50px' }}>
-          <p>Cargando servicios...</p>
+          <p>{t('servicios.loading')}</p>
         </div>
       ) : servicios.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '50px' }}>
-          <p>No hay servicios disponibles en este momento.</p>
+          <p>{t('servicios.noServices')}</p>
         </div>
       ) : (
         <div className="servicios-grid">
@@ -362,14 +362,14 @@ const Servicios = () => {
                   rows="4"
                   value={formData.mensaje}
                   onChange={handleInputChange}
-                  placeholder="Requisitos especiales, alergias, etc."
+                  placeholder={t('servicios.placeholder')}
                 />
               </div>
 
               {message && <p className={`form-message ${message.includes('Error') ? 'error' : 'success'}`}>{message}</p>}
 
               <button type="submit" className="reservar-btn" disabled={sending}>
-                {sending ? 'Enviando...' : 'Confirmar Reserva'}
+                {sending ?  t('servicios.sending') : t('servicios.confirm')}
               </button>
             </form>
           </div>

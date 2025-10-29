@@ -166,13 +166,13 @@ function Registro() {
     <PageTransition>
     <div className="registro-page">
       <div className="registro-container">
-        <button
+        {/*<button
           onClick={() => navigate('/')}
           className="btn-back"
           type="button"
         >
           ← {t('registro.title')}
-        </button>
+        </button>*/}
 
         <div className="registro-header">
           <h1>{t('registro.h1')}</h1>
@@ -259,7 +259,7 @@ function Registro() {
           </div>
 
           <button type="submit" className="registro-button" disabled={loading}>
-            {loading ? 'Registrando...' : 'Registrarse'}
+            {loading ? t('registro.loading') : t('registro.button')}
           </button>
 
           <div className="login-link">

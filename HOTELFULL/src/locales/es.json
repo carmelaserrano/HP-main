@@ -299,7 +299,21 @@
       "titulo": "Tours & Excursiones",
       "descripcion": "Descubre la región",
       "detalles": "Tours privados, excursiones grupales, deportes acuáticos y paseos en barco."
-    }
+    },
+    "loading": "Cargando servicios...",
+    "noServices": "No hay servicios disponibles en este momento.",
+    "placeholder": "Requisitos especiales, alergias, etc.",
+    "sending": "Enviando...",
+    "confirm": "Confirmar reserva",
+    "defaultDescription": "Servicio premium disponible",
+    "defaultDetails": "Consulta por más   detalles",
+    "errorLoading": "Error al cargar los servicios.",
+    "errorName": "El nombre solo puede contener letras y espacios.",
+    "errorEmail": "Por favor, ingresa un correo electrónico válido.",
+    "errorPhone": "El teléfono solo puede contener números, espacios, guiones y paréntesis.",
+    "errorCreate": "Error al crear la reserva. Por favor intenta nuevamente.",
+    "success": "¡Reserva creada exitosamente! Te contactaremos pronto."
+    
   }
   },
   "weather": {

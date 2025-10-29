@@ -299,7 +299,21 @@
       "titulo": "Tours & Excursions",
       "descripcion": "Discover the region",
       "detalles": "Private tours, group excursions, water sports, and boat trips."
-    }
+    },
+    "loading": "Loading services...",
+    "noServices": "No services available at the moment.",
+    "placeholder": "Special requirements, allergies, etc.",
+    "sending": "Sending...",
+    "confirm": "Confirm reservation",
+    "defaultDescription": "Premium service available",
+    "defaultDetails": "Contact us for more details",
+    "errorLoading": "Error loading services.",
+    "errorName": "The name can only contain letters and spaces.",
+    "errorEmail": "Please enter a valid email address.",
+    "errorPhone": "The phone number can only contain numbers, spaces, dashes and parentheses.",
+    "errorCreate": "Error creating the reservation. Please try again.",
+    "success": "Reservation created successfully! We will contact you soon."
+
   }
   },
   "weather": {
