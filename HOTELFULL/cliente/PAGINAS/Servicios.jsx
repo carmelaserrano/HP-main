@@ -16,7 +16,9 @@ const Servicios = () => {
   const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [user, setUser] = useState(null); // ← AGREGAR ESTA LÍNEA
+  const [user, setUser] = useState(null);
+  const [servicios, setServicios] = useState([]); // ← Ahora servicios se cargan dinámicamente
+  const [loading, setLoading] = useState(true); // ← Para mostrar estado de carga
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -28,6 +30,55 @@ const Servicios = () => {
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState('');
   const formRef = useRef();
+
+  // Cargar servicios desde Supabase
+  useEffect(() => {
+    const loadServicios = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('servicios_extras')
+          .select('*')
+          .eq('disponible', true) // Solo servicios disponibles
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Mapear los datos de Supabase al formato que espera el componente
+        const serviciosMapeados = data.map((serv, index) => ({
+          id: serv.id,
+          titulo: serv.nombre,
+          descripcion: serv.descripcion || 'Servicio premium disponible',
+          detalles: serv.descripcion || 'Consulta por más detalles',
+          precio: serv.precio,
+          // Usar la primera imagen del servicio si existe, sino usar Unsplash
+          imagen: serv.imagenes && serv.imagenes.length > 0
+            ? serv.imagenes[0]
+            : `https://images.unsplash.com/photo-${getImageId(index)}?w=600&h=400&fit=crop`
+        }));
+
+        setServicios(serviciosMapeados);
+      } catch (error) {
+        console.error('Error al cargar servicios:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadServicios();
+  }, []);
+
+  // Función auxiliar para obtener IDs de imágenes de Unsplash
+  const getImageId = (index) => {
+    const imageIds = [
+      '1414235077428-338989a2e8c0', // Restaurante
+      '1540555700478-4be289fbecef', // Spa
+      '1575429198097-0414ec08e8cd', // Piscina
+      '1534438327276-14e5300c3a48', // Gimnasio
+      '1566073771259-6a8506099945', // Room Service
+      '1544551763-46a013bb70d5'  // Tours
+    ];
+    return imageIds[index % imageIds.length];
+  };
 
   // Verificar si el usuario está logueado
   useEffect(() => {
@@ -92,7 +143,7 @@ const Servicios = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
     setMessage('');
@@ -121,26 +172,37 @@ const Servicios = () => {
       return;
     }
 
+    try {
+      // Obtener usuario actual
+      const { data: { session } } = await supabase.auth.getSession();
 
-    // Cuando haces clic en "Gimnasio Premium", se guarda en selectedService, y luego cuando envías el formulario, selectedService.titulo toma ese valor ("Gimnasio Premium") y lo incluye en los datos que se envían por EmailJS.
-    const templateParams = {
-      servicio: selectedService.titulo,
-      nombre: formData.nombre,
-      email: formData.email,
-      telefono: formData.telefono,
-      fecha: formData.fecha,
-      personas: formData.personas,
-      mensaje: formData.mensaje
-    };
+      // Guardar reserva en la base de datos
+      const { data: reservaData, error: reservaError } = await supabase
+        .from('reserva_servicio')
+        .insert([{
+          servicio_id: selectedService.id,
+          usuario_id: session?.user?.id,
+          fecha: formData.fecha,
+          cantidad_personas: parseInt(formData.personas),
+          estado: 'pendiente',
+          nombre_cliente: formData.nombre,
+          email_cliente: formData.email,
+          telefono_cliente: formData.telefono,
+          notas: formData.mensaje
+        }])
+        .select();
 
-    emailjs.send(
-      'YOUR_SERVICE_ID',
-      'YOUR_TEMPLATE_ID',
-      templateParams,
-      'YOUR_PUBLIC_KEY'
-    )
-    .then(() => {
-      setMessage('¡Reserva enviada exitosamente! Te contactaremos pronto.');
+      if (reservaError) {
+        console.error('Error al guardar reserva:', reservaError);
+        setMessage('Error al crear la reserva. Por favor intenta nuevamente.');
+        setSending(false);
+        return;
+      }
+
+      // Mostrar mensaje de éxito
+      setMessage('¡Reserva creada exitosamente! Te contactaremos pronto.');
+
+      // Limpiar formulario
       setFormData({
         nombre: '',
         email: '',
@@ -149,65 +211,21 @@ const Servicios = () => {
         personas: '',
         mensaje: ''
       });
+
+      // Cerrar modal después de 2 segundos
       setTimeout(() => {
         setShowForm(false);
         setSelectedService(null);
         setMessage('');
-      }, 3000);
-    })
-    .catch(() => {
-      setMessage('Error al enviar la reserva. Por favor intenta nuevamente.');
-    })
-    .finally(() => {
-      setSending(false);
-    });
-  };
+      }, 2000);
 
-  // datos de los servicios
-    const servicios = [
-    {
-    id: 1,
-    titulo: t('servicios.items.1.titulo'),
-    descripcion: t('servicios.items.1.descripcion'),
-    detalles: t('servicios.items.1.detalles'),
-    imagen: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop"
-    },
-    {
-    id: 2,
-    titulo: t('servicios.items.2.titulo'),
-    descripcion: t('servicios.items.2.descripcion'),
-    detalles: t('servicios.items.2.detalles'),
-    imagen: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=400&fit=crop"
-    },
-    {
-    id: 3,
-    titulo: t('servicios.items.3.titulo'),
-    descripcion: t('servicios.items.3.descripcion'),
-    detalles: t('servicios.items.3.detalles'),
-    imagen: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=600&h=400&fit=crop"
-    },
-    {
-    id: 4,
-    titulo: t('servicios.items.4.titulo'),
-    descripcion: t('servicios.items.4.descripcion'),
-    detalles: t('servicios.items.4.detalles'),
-    imagen: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop"
-    },
-    {
-    id: 5,
-    titulo: t('servicios.items.5.titulo'),
-    descripcion: t('servicios.items.5.descripcion'),
-    detalles: t('servicios.items.5.detalles'),
-    imagen: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop"
-    },
-    {
-    id: 6,
-    titulo: t('servicios.items.6.titulo'),
-    descripcion: t('servicios.items.6.descripcion'),
-    detalles: t('servicios.items.6.detalles'),
-    imagen: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop"
+    } catch (error) {
+      console.error('Error completo:', error);
+      setMessage('Error al crear la reserva. Por favor intenta nuevamente.');
+    } finally {
+      setSending(false);
     }
-  ];
+  };
 
   return (
     <PageTransition>
@@ -217,8 +235,17 @@ const Servicios = () => {
         <p>{t('servicios.subtitle')}</p>
       </div>
 
-      <div className="servicios-grid">
-        {servicios.map((servicio) => (
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <p>Cargando servicios...</p>
+        </div>
+      ) : servicios.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <p>No hay servicios disponibles en este momento.</p>
+        </div>
+      ) : (
+        <div className="servicios-grid">
+          {servicios.map((servicio) => (
           <div
             key={servicio.id}
             className="servicio-card"
@@ -239,7 +266,8 @@ const Servicios = () => {
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
 
 {/* si selected service tiene un valor osea no es 0 renderisa el modal . cuando puse el formulario agregue showform*/}
@@ -250,7 +278,6 @@ const Servicios = () => {
             <button className="close-btn" onClick={() => setSelectedService(null)}>×</button>
             <img src={selectedService.imagen} alt={selectedService.titulo} />
             <h2>{selectedService.titulo}</h2>
-            <p className="descripcion">{selectedService.descripcion}</p>
             <p className="detalles">{selectedService.detalles}</p>
             <button className="reservar-btn" onClick={handleReservarClick}>{t('servicios.reservar')}</button>
           </div>

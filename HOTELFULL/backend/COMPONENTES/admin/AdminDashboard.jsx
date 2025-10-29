@@ -6,6 +6,9 @@ import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Ba
 
 function AdminDashboard() {
   const [user, setUser] = useState(null);
+  const [servicios, setServicios] = useState([]);
+const [showNuevoServicio, setShowNuevoServicio] = useState(false);
+const [editingServicio, setEditingServicio] = useState(null);
   const [stats, setStats] = useState({
     totalHabitaciones: 0,
     habitacionesDisponibles: 0,
@@ -54,6 +57,7 @@ function AdminDashboard() {
 
       await loadHabitaciones();
       await loadOperadores();
+      await loadServicios();
       await loadReservas();
 
       setLoading(false);
@@ -102,6 +106,66 @@ function AdminDashboard() {
       totalOperadores: data?.length || 0,
       operadoresActivos: activos
     }));
+  };
+  const loadServicios = async () => {
+    try {
+      // Cargar servicios
+      const { data: serviciosData, error: serviciosError } = await supabase
+        .from('servicios_extras')
+        .select('*')
+        .order('nombre', { ascending: true });
+
+      if (serviciosError) {
+        console.error('Error al cargar servicios:', serviciosError);
+        return;
+      }
+
+      // Cargar todas las reservas de hoy
+      const hoy = new Date().toISOString().split('T')[0];
+      console.log('📅 Fecha de hoy:', hoy);
+
+      // Primero, cargar TODAS las reservas para ver qué hay
+      const { data: todasReservas, error: todasError } = await supabase
+        .from('reserva_servicio')
+        .select('*');
+
+      console.log('📋 TODAS las reservas en la BD:', todasReservas);
+      if (todasError) {
+        console.error('❌ Error al cargar todas las reservas:', todasError);
+      }
+
+      // Ahora cargar solo las de hoy
+      const { data: reservasData, error: reservasError } = await supabase
+        .from('reserva_servicio')
+        .select('servicio_id, cantidad_maxima, estado, fecha')
+        .eq('fecha', hoy)
+        .neq('estado', 'cancelada');
+
+      if (reservasError) {
+        console.error('❌ Error al cargar reservas de hoy:', reservasError);
+      }
+
+      console.log('📊 Reservas de hoy filtradas:', reservasData);
+
+      // Calcular cupos disponibles para cada servicio
+      const serviciosConDisponibilidad = serviciosData.map(serv => {
+        const reservasHoy = reservasData?.filter(r => r.servicio_id === serv.id) || [];
+        const personasReservadas = reservasHoy.reduce((sum, r) => sum + (r.cantidad_maxima || 0), 0);
+        const cuposDisponibles = (serv.capacidad_maxima || 0) - personasReservadas;
+
+        console.log(`🏨 ${serv.nombre}: ${personasReservadas} personas reservadas, ${cuposDisponibles} cupos disponibles`);
+
+        return {
+          ...serv,
+          cuposDisponibles,
+          tieneReservasHoy: reservasHoy.length > 0
+        };
+      });
+
+      setServicios(serviciosConDisponibilidad);
+    } catch (error) {
+      console.error('Error en loadServicios:', error);
+    }
   };
 
   const loadReservas = async () => {
@@ -241,7 +305,7 @@ function AdminDashboard() {
         </button>
       </div>
 
-      {/* Navigation Tabs */}
+      {/* Navigation Tabs, serian botones  */}
       <div className="dashboard-tabs">
         <button
           className={activeSection === 'dashboard' ? 'tab-active' : 'tab'}
@@ -260,6 +324,12 @@ function AdminDashboard() {
           onClick={() => setActiveSection('habitaciones')}
         >
           Habitaciones
+        </button>
+        <button
+          className={activeSection === 'servicios' ? 'tab-active' : 'tab'}
+          onClick={() => setActiveSection('servicios')}
+        >
+          Servicios
         </button>
       </div>
 
@@ -477,6 +547,82 @@ function AdminDashboard() {
             </div>
           </div>
         )}
+        {/* SECCIÓN SERVICIOS */}
+{activeSection === 'servicios' && (
+  <div className="dashboard-card">
+    <div className="section-header">
+      <h2>Gestión de Servicios</h2>
+      <button className="btn-primary" onClick={() => setShowNuevoServicio(true)}>
+        + Nuevo Servicio
+      </button>
+    </div>
+
+    <div className="table-container">
+      <table className="dashboard-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Capacidad Máxima</th>
+            <th>Cupos Disponibles Hoy</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {servicios.map(serv => {
+            const tieneCapacidad = serv.capacidad_maxima > 0;
+            const tieneCupos = serv.cuposDisponibles > 0;
+
+            // Determinar el estado
+            let estadoBadge = 'badge-pendiente'; // amarillo por defecto
+            let estadoTexto = 'Sin configurar';
+
+            if (!tieneCapacidad) {
+              // Sin capacidad configurada
+              estadoBadge = 'badge-pendiente';
+              estadoTexto = 'Sin configurar';
+            } else if (tieneCupos) {
+              // Tiene cupos disponibles
+              estadoBadge = 'badge-confirmada';
+              estadoTexto = 'Disponible';
+            } else {
+              // Sin cupos (completo)
+              estadoBadge = 'badge-cancelada';
+              estadoTexto = 'Completo';
+            }
+
+            return (
+              <tr key={serv.id}>
+                <td><strong>{serv.nombre}</strong></td>
+                <td>{serv.descripcion || 'Sin descripción'}</td>
+                <td>${serv.precio}</td>
+                <td>{serv.capacidad_maxima || 'N/A'} {tieneCapacidad ? 'personas' : ''}</td>
+                <td>
+                  {tieneCapacidad ? `${serv.cuposDisponibles}` : 'N/A'}
+                </td>
+                <td>
+                  <span className={`badge ${estadoBadge}`}>
+                    {estadoTexto}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="btn-action"
+                    onClick={() => setEditingServicio(serv)}
+                  >
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
       </div>
 
       {/* Modales */}
@@ -500,6 +646,26 @@ function AdminDashboard() {
           }}
         />
       )}
+      {showNuevoServicio && (
+  <ModalServicio
+    onClose={() => setShowNuevoServicio(false)}
+    onSuccess={() => {
+      setShowNuevoServicio(false);
+      loadServicios();
+    }}
+  />
+)}
+
+{editingServicio && (
+  <ModalServicio
+    servicio={editingServicio}
+    onClose={() => setEditingServicio(null)}
+    onSuccess={() => {
+      setEditingServicio(null);
+      loadServicios();
+    }}
+  />
+)}
 
       {showNuevoOperador && (
         <ModalOperador
@@ -824,6 +990,8 @@ function ModalOperador({ onClose, onSuccess, operador }) {
 
     try {
       if (operador) {
+
+
         // Editar operador existente
         const updateData = {
           nombre: formData.nombre,
@@ -838,6 +1006,8 @@ function ModalOperador({ onClose, onSuccess, operador }) {
         if (error) throw error;
         alert('Operador actualizado exitosamente!');
       } else {
+
+
         // Crear nuevo operador
         if (!formData.password) {
           alert('La contraseña es obligatoria para crear un operador');
@@ -882,7 +1052,7 @@ function ModalOperador({ onClose, onSuccess, operador }) {
   .from('profiles')
   .update({
     nombre: formData.nombre,
-    email: formData.email,  // ✅ Ahora SÍ agrégalo
+    email: formData.email,  
     telefono: formData.telefono,
     rol: 'operador',
     activo: true
@@ -900,7 +1070,7 @@ function ModalOperador({ onClose, onSuccess, operador }) {
   .insert([{
     id: authData.user.id,
     nombre: formData.nombre,
-    email: formData.email,  // ✅ Ahora SÍ agrégalo
+    email: formData.email,  
     telefono: formData.telefono,
     rol: 'operador',
     activo: true
@@ -976,6 +1146,304 @@ function ModalOperador({ onClose, onSuccess, operador }) {
             </button>
             <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Guardando...' : operador ? 'Actualizar' : 'Crear'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+// MODAL SERVICIO
+function ModalServicio({ onClose, onSuccess, servicio }) {
+  const [formData, setFormData] = useState({
+    nombre: servicio?.nombre || '',
+    descripcion: servicio?.descripcion || '',
+    precio: servicio?.precio || '',
+    capacidad_maxima: servicio?.capacidad_maxima || '',
+    disponible: servicio?.disponible ?? true
+  });
+  const [imageFiles, setImageFiles] = useState([]);
+  const [existingImages, setExistingImages] = useState(servicio?.imagenes || []);
+  const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    handleFiles(files);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
+  const handleFiles = (files) => {
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    if (imageFiles.length === 0) {
+      alert('Por favor selecciona solo archivos de imagen');
+      return;
+    }
+    setImageFiles(prev => [...prev, ...imageFiles]);
+  };
+
+  const removeImage = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async () => {
+    const uploadedUrls = [];
+
+    for (const file of imageFiles) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `servicios/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('imagenes')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Error al subir imagen:', uploadError);
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from('imagenes')
+        .getPublicUrl(filePath);
+
+      uploadedUrls.push(data.publicUrl);
+    }
+
+    return uploadedUrls;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Subir las nuevas imágenes
+      const newImageUrls = imageFiles.length > 0 ? await uploadImages() : [];
+
+      // Combinar imágenes existentes con las nuevas
+      const allImageUrls = [...existingImages, ...newImageUrls];
+
+      const dataToSave = {
+        ...formData,
+        imagenes: allImageUrls.length > 0 ? allImageUrls : []
+      };
+
+      if (servicio) {
+        // Editar servicio existente
+        const { error } = await supabase
+          .from('servicios_extras')
+          .update(dataToSave)
+          .eq('id', servicio.id);
+
+        if (error) throw error;
+
+        // Primero cerrar el modal y recargar datos
+        onSuccess();
+        // Luego mostrar el mensaje
+        setTimeout(() => alert('Servicio actualizado exitosamente!'), 100);
+      } else {
+        // Crear nuevo servicio
+        const { error } = await supabase
+          .from('servicios_extras')
+          .insert([dataToSave]);
+
+        if (error) throw error;
+
+        // Primero cerrar el modal y recargar datos
+        onSuccess();
+        // Luego mostrar el mensaje
+        setTimeout(() => alert('Servicio creado exitosamente!'), 100);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2>{servicio ? 'Editar Servicio' : 'Nuevo Servicio'}</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Nombre del Servicio</label>
+            <input
+              type="text"
+              value={formData.nombre}
+              onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+              placeholder="Ej: Spa, Desayuno, Traslado..."
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Descripción</label>
+            <textarea
+              value={formData.descripcion}
+              onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
+              rows="3"
+              placeholder="Describe el servicio..."
+            ></textarea>
+          </div>
+
+          <div className="form-group">
+            <label>Precio</label>
+            <input
+              type="number"
+              value={formData.precio}
+              onChange={(e) => setFormData({...formData, precio: parseFloat(e.target.value)})}
+              placeholder="0.00"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Capacidad Máxima</label>
+            <input
+              type="number"
+              value={formData.capacidad_maxima}
+              onChange={(e) => setFormData({...formData, capacidad_maxima: parseInt(e.target.value)})}
+              placeholder="Ej: 10, 20, 50..."
+              min="1"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              Imágenes
+              {(existingImages.length > 0 || imageFiles.length > 0) &&
+                ` (${existingImages.length + imageFiles.length} total)`}
+            </label>
+
+            {/* Mostrar imágenes existentes */}
+            {existingImages.length > 0 && (
+              <div style={{ marginBottom: '15px' }}>
+                <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '8px' }}>
+                  Imágenes actuales:
+                </p>
+                <div className="image-preview-grid">
+                  {existingImages.map((url, index) => (
+                    <div key={`existing-${index}`} className="image-preview-item">
+                      <img src={url} alt={`Imagen ${index + 1}`} />
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeExistingImage(index);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Zona para agregar nuevas imágenes */}
+            <div
+              className={`image-upload-zone ${isDragging ? 'dragging' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById('fileInputServicio').click()}
+            >
+              <input
+                id="fileInputServicio"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+              />
+              <div className="upload-icon">📸</div>
+              <p className="upload-text">
+                <strong>Arrastra múltiples imágenes aquí o haz clic para seleccionar</strong>
+              </p>
+              <p className="upload-text" style={{ fontSize: '0.85em', marginTop: '5px', color: '#666' }}>
+                Puedes seleccionar todas las imágenes que quieras
+              </p>
+            </div>
+
+            {/* Mostrar nuevas imágenes seleccionadas */}
+            {imageFiles.length > 0 && (
+              <div style={{ marginTop: '15px' }}>
+                <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '8px' }}>
+                  Nuevas imágenes ({imageFiles.length}):
+                </p>
+                <div className="image-preview-grid">
+                  {imageFiles.map((file, index) => (
+                    <div key={`new-${index}`} className="image-preview-item">
+                      <img src={URL.createObjectURL(file)} alt={`Preview ${index + 1}`} />
+                      <button
+                        type="button"
+                        className="remove-image-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeImage(index);
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Botón para agregar más imágenes */}
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ marginTop: '10px', width: '100%' }}
+              onClick={() => document.getElementById('fileInputServicio').click()}
+            >
+              + Agregar más imágenes
+            </button>
+          </div>
+
+          <div className="form-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={formData.disponible}
+                onChange={(e) => setFormData({...formData, disponible: e.target.checked})}
+              />
+              {' '}Disponible
+            </label>
+          </div>
+
+          <div className="modal-buttons">
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancelar
+            </button>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Guardando...' : servicio ? 'Actualizar' : 'Crear'}
             </button>
           </div>
         </form>
