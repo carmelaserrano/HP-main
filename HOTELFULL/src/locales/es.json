@@ -296,9 +296,39 @@
       "detalles": "Menú completo. Desayuno en cama. Cena romántica. Pedidos especiales."
     },
     "6": {
+      "titulo": "Restaurante Gourmet",
+      "descripcion": "Experiencia culinaria única con cocina internacional",
+      "detalles": "Experiencia culinaria única con cocina internacional"
+    },
+    "7": {
+      "titulo": "Spa & Wellness",
+      "descripcion": "Relájate con tratamientos profesionales",
+      "detalles": "Relájate con tratamientos profesionales. Masajes relajantes, tratamientos faciales, sauna, jacuzzi, yoga y meditación."
+    },
+    "8": {
+      "titulo": "Piscina Infinity",
+      "descripcion": "Vista panorámica al océano. Abierta 24/7",
+      "detalles": "Vista panorámica al océano. Abierta 24/7"
+    },
+    "9": {
+      "titulo": "Gimnasio Premium",
+      "descripcion": "Equipamiento de última generación. Abierto 24 horas",
+      "detalles": "Equipamiento de última generación. Abierto 24 horas. Entrenador personal. Clases grupales. Equipo cardiovascular."
+    },
+    "10": {
+      "titulo": "Room Service",
+      "descripcion": "Servicio a la habitación 24/7. Menú completo",
+      "detalles": "Servicio a la habitación 24/7. Menú completo. Desayuno en cama. Cena romántica. Pedidos especiales."
+    },
+    "11": {
       "titulo": "Tours & Excursiones",
-      "descripcion": "Descubre la región",
-      "detalles": "Tours privados, excursiones grupales, deportes acuáticos y paseos en barco."
+      "descripcion": "Descubre la región con tours privados, excursiones grupales",
+      "detalles": "Descubre la región con tours privados, excursiones grupales, deportes acuáticos y paseos en barco."
+    },
+    "34": {
+      "titulo": "Spinning",
+      "descripcion": "Disfruta de clases de spinning con nuestro gran equipo",
+      "detalles": "Disfruta de clases de spinning con nuestro gran equipo. Lunes a viernes de 8:00 am a 9:00 am"
     },
     "loading": "Cargando servicios...",
     "noServices": "No hay servicios disponibles en este momento.",

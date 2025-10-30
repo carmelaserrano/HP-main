@@ -4,6 +4,7 @@ import { supabase } from '../SERVICIOS/supabaseClient';
 import emailjs from '@emailjs/browser';
 import '../ESTILOS/Servicios.css'
 import { useTranslation } from 'react-i18next'
+import i18n from '../../src/i18n';
 import PageTransition from '../COMPONENTES/PageTransition.jsx'
 
 // boto de reservar que abre un formulario modal para reservar el servicio seleccionado
@@ -31,7 +32,7 @@ const Servicios = () => {
   const [message, setMessage] = useState('');
   const formRef = useRef();
 
-  // Cargar servicios desde Supabase
+  // Cargar servicios desde Supabase y combinar con traducciones
   useEffect(() => {
     const loadServicios = async () => {
       try {
@@ -44,16 +45,16 @@ const Servicios = () => {
         if (error) throw error;
 
         // Mapear los datos de Supabase al formato que espera el componente
-        const serviciosMapeados = data.map((serv, index) => ({
+        const serviciosMapeados = data.map((serv) => ({
           id: serv.id,
-          titulo: serv.nombre,
-          descripcion: serv.descripcion || t('servicios.defaultDescription'),
-          detalles: serv.descripcion || t('servicios.defaultDetails'),
+          titulo: t(`servicios.items.${serv.id}.titulo`) || serv.nombre,
+          descripcion: t(`servicios.items.${serv.id}.descripcion`) || serv.descripcion || t('servicios.defaultDescription'),
+          detalles: t(`servicios.items.${serv.id}.detalles`) || serv.descripcion || t('servicios.defaultDetails'),
           precio: serv.precio,
-          // Usar la primera imagen del servicio si existe, sino usar Unsplash
+          // Usar la primera imagen del servicio si existe, sino usar imagen mapeada por ID
           imagen: serv.imagenes && serv.imagenes.length > 0
             ? serv.imagenes[0]
-            : `https://images.unsplash.com/photo-${getImageId(index)}?w=600&h=400&fit=crop`
+            : getImageByServiceId(serv.id)
         }));
 
         setServicios(serviciosMapeados);
@@ -65,19 +66,20 @@ const Servicios = () => {
     };
 
     loadServicios();
-  }, []);
+  }, [t, i18n.language]);
 
-  // Función auxiliar para obtener IDs de imágenes de Unsplash
-  const getImageId = (index) => {
-    const imageIds = [
-      '1414235077428-338989a2e8c0', // Restaurante
-      '1540555700478-4be289fbecef', // Spa
-      '1575429198097-0414ec08e8cd', // Piscina
-      '1534438327276-14e5300c3a48', // Gimnasio
-      '1566073771259-6a8506099945', // Room Service
-      '1544551763-46a013bb70d5'  // Tours
-    ];
-    return imageIds[index % imageIds.length];
+  // Función auxiliar para obtener imágenes específicas según el ID del servicio
+  const getImageByServiceId = (serviceId) => {
+    const imageMapping = {
+      6: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop', // Restaurante Gourmet
+      7: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&h=400&fit=crop', // Spa & Wellness
+      8: 'https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=600&h=400&fit=crop', // Piscina Infinity
+      9: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop', // Gimnasio Premium
+      10: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop', // Room Service
+      11: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop', // Tours & Excursiones
+      34: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&h=400&fit=crop'  // Spinning
+    };
+    return imageMapping[serviceId] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop';
   };
 
   // Verificar si el usuario está logueado

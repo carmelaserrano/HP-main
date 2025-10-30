@@ -296,9 +296,39 @@
       "detalles": "Full menu. Breakfast in bed. Romantic dinner. Special orders."
     },
     "6": {
+      "titulo": "Gourmet Restaurant",
+      "descripcion": "Unique culinary experience with international cuisine",
+      "detalles": "Unique culinary experience with international cuisine"
+    },
+    "7": {
+      "titulo": "Spa & Wellness",
+      "descripcion": "Relax with professional treatments",
+      "detalles": "Relax with professional treatments. Relaxing massages, facial treatments, sauna, jacuzzi, yoga and meditation."
+    },
+    "8": {
+      "titulo": "Infinity Pool",
+      "descripcion": "Panoramic ocean view. Open 24/7",
+      "detalles": "Panoramic ocean view. Open 24/7"
+    },
+    "9": {
+      "titulo": "Premium Gym",
+      "descripcion": "State-of-the-art equipment. Open 24 hours",
+      "detalles": "State-of-the-art equipment. Open 24 hours. Personal trainer. Group classes. Cardio equipment."
+    },
+    "10": {
+      "titulo": "Room Service",
+      "descripcion": "24/7 in-room service. Full menu",
+      "detalles": "24/7 in-room service. Full menu. Breakfast in bed. Romantic dinner. Special orders."
+    },
+    "11": {
       "titulo": "Tours & Excursions",
-      "descripcion": "Discover the region",
-      "detalles": "Private tours, group excursions, water sports, and boat trips."
+      "descripcion": "Discover the region with private tours and group excursions",
+      "detalles": "Discover the region with private tours, group excursions, water sports, and boat trips."
+    },
+    "34": {
+      "titulo": "Spinning",
+      "descripcion": "Enjoy spinning classes with our great team",
+      "detalles": "Enjoy spinning classes with our great team. Monday to Friday from 8:00 AM to 9:00 AM"
     },
     "loading": "Loading services...",
     "noServices": "No services available at the moment.",
