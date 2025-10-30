@@ -120,40 +120,25 @@ const [editingServicio, setEditingServicio] = useState(null);
         return;
       }
 
-      // Cargar todas las reservas de hoy
-      const hoy = new Date().toISOString().split('T')[0];
-      console.log('📅 Fecha de hoy:', hoy);
-
-      // Primero, cargar TODAS las reservas para ver qué hay
-      const { data: todasReservas, error: todasError } = await supabase
-        .from('reserva_servicio')
-        .select('*');
-
-      console.log('📋 TODAS las reservas en la BD:', todasReservas);
-      if (todasError) {
-        console.error('❌ Error al cargar todas las reservas:', todasError);
-      }
-
-      // Ahora cargar solo las de hoy
+      // Cargar todas las reservas (sin filtrar por fecha porque el campo fecha no existe)
       const { data: reservasData, error: reservasError } = await supabase
         .from('reserva_servicio')
-        .select('servicio_id, cantidad_maxima, estado, fecha')
-        .eq('fecha', hoy)
+        .select('servicio_id, cantidad, estado, created_at')
         .neq('estado', 'cancelada');
 
       if (reservasError) {
-        console.error('❌ Error al cargar reservas de hoy:', reservasError);
+        console.error('❌ Error al cargar reservas:', reservasError);
       }
 
-      console.log('📊 Reservas de hoy filtradas:', reservasData);
+      console.log('📊 Todas las reservas activas:', reservasData);
 
       // Calcular cupos disponibles para cada servicio
       const serviciosConDisponibilidad = serviciosData.map(serv => {
         const reservasHoy = reservasData?.filter(r => r.servicio_id === serv.id) || [];
-        const personasReservadas = reservasHoy.reduce((sum, r) => sum + (r.cantidad_maxima || 0), 0);
+        const personasReservadas = reservasHoy.reduce((sum, r) => sum + (r.cantidad || 0), 0);
         const cuposDisponibles = (serv.capacidad_maxima || 0) - personasReservadas;
 
-        console.log(`🏨 ${serv.nombre}: ${personasReservadas} personas reservadas, ${cuposDisponibles} cupos disponibles`);
+        console.log(`${serv.nombre}: ${personasReservadas} personas reservadas, ${cuposDisponibles} cupos disponibles`);
 
         return {
           ...serv,
@@ -566,7 +551,6 @@ const [editingServicio, setEditingServicio] = useState(null);
             <th>Precio</th>
             <th>Capacidad Máxima</th>
             <th>Cupos Disponibles Hoy</th>
-            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -601,11 +585,6 @@ const [editingServicio, setEditingServicio] = useState(null);
                 <td>{serv.capacidad_maxima || 'N/A'} {tieneCapacidad ? 'personas' : ''}</td>
                 <td>
                   {tieneCapacidad ? `${serv.cuposDisponibles}` : 'N/A'}
-                </td>
-                <td>
-                  <span className={`badge ${estadoBadge}`}>
-                    {estadoTexto}
-                  </span>
                 </td>
                 <td>
                   <button
@@ -695,10 +674,16 @@ const [editingServicio, setEditingServicio] = useState(null);
 function ModalHabitacion({ onClose, onSuccess, habitacion }) {
   const [formData, setFormData] = useState({
     numero: habitacion?.numero || '',
-    tipo: habitacion?.tipo || 'Simple',
+    tipo: habitacion?.tipo || '',
     capacidad: habitacion?.capacidad || 1,
     precio_por_noche: habitacion?.precio_por_noche || '',
-    descripcion: habitacion?.descripcion || ''
+    descripcion: habitacion?.descripcion || '',
+    metros_cuadrados: habitacion?.metros_cuadrados || null,
+    tipo_cama: habitacion?.tipo_cama || 'Cama King size',
+    wifi: habitacion?.wifi !== undefined ? habitacion.wifi : false,
+    tv_smart: habitacion?.tv_smart !== undefined ? habitacion.tv_smart : false,
+    aire_acondicionado: habitacion?.aire_acondicionado !== undefined ? habitacion.aire_acondicionado : false,
+    bano_completo: habitacion?.bano_completo !== undefined ? habitacion.bano_completo : false
   });
   const [imageFiles, setImageFiles] = useState([]);
   const [existingImages, setExistingImages] = useState(habitacion?.imagenes || []);
@@ -782,8 +767,16 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
       // Combinar imágenes existentes con las nuevas
       const allImageUrls = [...existingImages, ...newImageUrls];
 
-      const dataToSave = {
+      // Limpiar el formData antes de guardar
+      const cleanedFormData = {
         ...formData,
+        metros_cuadrados: formData.metros_cuadrados || null,
+        precio_por_noche: formData.precio_por_noche ? parseFloat(formData.precio_por_noche) : 0,
+        capacidad: formData.capacidad ? parseInt(formData.capacidad) : 1
+      };
+
+      const dataToSave = {
+        ...cleanedFormData,
         imagenes: allImageUrls.length > 0 ? allImageUrls : []
       };
 
@@ -832,8 +825,12 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
 
           <div className="form-group">
             <label>Nombre</label>
-            <input type="text" 
-            onChange={(e) => setFormData({...formData, tipo: e.target.value})}/>
+            <input 
+              type="text"
+              value={formData.tipo}
+              onChange={(e) => setFormData({...formData, tipo: e.target.value})}
+              required
+            />
           </div>
 
           <div className="form-group">
@@ -847,16 +844,17 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
           </div>
 
           <div className="form-group">
-            <label>Precio por Noche</label>
+            <label>Precio por Noche ($)</label>
             <input
               type="number"
               value={formData.precio_por_noche}
               onChange={(e) => setFormData({...formData, precio_por_noche: parseFloat(e.target.value)})}
+              placeholder="250"
               required
             />
           </div>
 
-          <div className="form-group">
+           <div className="form-group">
             <label>Descripción</label>
             <textarea
               value={formData.descripcion}
@@ -864,6 +862,79 @@ function ModalHabitacion({ onClose, onSuccess, habitacion }) {
               rows="3"
             ></textarea>
           </div>
+
+          <div className="form-group">
+            <label>Metros Cuadrados (m²)</label>
+            <input
+              type="number"
+              value={formData.metros_cuadrados || ''}
+              onChange={(e) => setFormData({...formData, metros_cuadrados: e.target.value ? parseInt(e.target.value) : null})}
+              placeholder="60"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Tipo de Cama</label>
+            <select
+              value={formData.tipo_cama}
+              onChange={(e) => setFormData({...formData, tipo_cama: e.target.value})}
+            >
+              <option value="Cama King size">Cama King size</option>
+              <option value="Cama Queen size">Cama Queen size</option>
+              <option value="Cama Doble">Cama Doble</option>
+              <option value="Cama Individual">Cama Individual</option>
+              <option value="2 Camas Individuales">2 Camas Individuales</option>
+              <option value="2 Camas Dobles">2 Camas Dobles</option>
+            </select>
+          </div>
+
+          <div className="form-group" style={{marginBottom: '20px'}}>
+            <label style={{display: 'block', marginBottom: '10px', fontWeight: 'bold'}}>Amenidades</label>
+            <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+              <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer'}}>
+                <input
+                  type="checkbox"
+                  checked={formData.wifi}
+                  onChange={(e) => setFormData({...formData, wifi: e.target.checked})}
+                />
+                <span>WiFi de alta velocidad</span>
+              </label>
+              <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer'}}>
+                <input
+                  type="checkbox"
+                  checked={formData.tv_smart}
+                  onChange={(e) => setFormData({...formData, tv_smart: e.target.checked})}
+                />
+                <span>Smart TV 55"</span>
+              </label>
+              <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer'}}>
+                <input
+                  type="checkbox"
+                  checked={formData.aire_acondicionado}
+                  onChange={(e) => setFormData({...formData, aire_acondicionado: e.target.checked})}
+                />
+                <span>Aire acondicionado</span>
+              </label>
+              <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer'}}>
+                <input
+                  type="checkbox"
+                  checked={formData.bano_completo}
+                  onChange={(e) => setFormData({...formData, bano_completo: e.target.checked})}
+                />
+                <span>Baño completo</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>
+              Imágenes
+              {(existingImages.length > 0 || imageFiles.length > 0) &&
+                ` (${existingImages.length + imageFiles.length} total)`}
+            </label>
+          </div>
+
+          
 
           <div className="form-group">
             <label>
@@ -1159,7 +1230,7 @@ function ModalServicio({ onClose, onSuccess, servicio }) {
     nombre: servicio?.nombre || '',
     descripcion: servicio?.descripcion || '',
     precio: servicio?.precio || '',
-    capacidad_maxima: servicio?.capacidad_maxima || '',
+    capacidad_maxima: servicio?.cantidad || '',
     disponible: servicio?.disponible ?? true
   });
   const [imageFiles, setImageFiles] = useState([]);

@@ -66,7 +66,7 @@ function OperadorDashboard() {
       return;
     }
 
-    // Cargar reservas activas para calcular el estado real
+    // Cargar reservas activas (confirmadas Y pendientes) para calcular el estado real
     const { data: reservasActivas } = await supabase
       .from('reservas')
       .select('*, habitaciones(numero)')
@@ -85,22 +85,35 @@ const hoy = `${year}-${month}-${day}`;
 
     // Calcular estado real de cada habitación
     const habitacionesConEstadoReal = (data || []).map(hab => {
-      // Buscar si tiene reserva activa para hoy
+      // Buscar si tiene reserva activa Y estamos dentro del rango de fechas
       const tieneReservaActiva = (reservasActivas || []).some(reserva => {
         const fechaEntrada = reserva.fecha_entrada;
         const fechaSalida = reserva.fecha_salida;
 
-        const cumpleCondicion = reserva.habitacion_id === hab.id &&
-               fechaEntrada <= hoy &&
-               fechaSalida >= hoy;
+        // La habitación está ocupada si:
+        // CASO 1: Reserva CONFIRMADA y estamos en el rango de fechas
+        // CASO 2: Reserva PENDIENTE pero YA llegó la fecha de check-in
+        const esConfirmadaEnRango = reserva.estado === 'confirmada' &&
+                                     fechaEntrada <= hoy &&
+                                     fechaSalida >= hoy;
 
-        if (hab.numero === '601' || hab.numero === 601) {
-          console.log(`🔍 Habitación 601:`, {
+        const esPendienteYaComenzo = reserva.estado === 'pendiente' &&
+                                      fechaEntrada <= hoy &&
+                                      fechaSalida >= hoy;
+
+        const cumpleCondicion = reserva.habitacion_id === hab.id &&
+                                (esConfirmadaEnRango || esPendienteYaComenzo);
+
+        if (hab.numero === '601' || hab.numero === 601 || hab.numero === '301' || hab.numero === 301 || hab.numero === '401' || hab.numero === 401) {
+          console.log(`🔍 Habitación ${hab.numero}:`, {
             reserva_id: reserva.id,
+            estado_reserva: reserva.estado,
             habitacion_numero: reserva.habitaciones?.numero,
             fechaEntrada,
             fechaSalida,
             hoy,
+            esConfirmadaEnRango,
+            esPendienteYaComenzo,
             cumpleCondicion
           });
         }
@@ -108,7 +121,17 @@ const hoy = `${year}-${month}-${day}`;
         return cumpleCondicion;
       });
 
-      const estadoFinal = tieneReservaActiva ? 'ocupada' : hab.estado;
+      // Si tiene reserva activa y estamos en el rango de fechas -> ocupada
+      // Si el estado original es 'mantenimiento' -> mantenerlo
+      // De lo contrario -> disponible
+      let estadoFinal;
+      if (tieneReservaActiva) {
+        estadoFinal = 'ocupada';
+      } else if (hab.estado === 'mantenimiento') {
+        estadoFinal = 'mantenimiento';
+      } else {
+        estadoFinal = 'disponible';
+      }
 
       if (hab.numero === '601' || hab.numero === 601) {
         console.log(`🏠 Habitación 601 estado final:`, {
@@ -599,20 +622,11 @@ function ModalProcesarPago({ reserva, onClose, onSuccess }) {
       if (reservaError) throw reservaError;
       console.log('✅ Reserva actualizada:', reservaData);
 
-      // Cambiar estado de la habitación a 'ocupada'
-      const { error: habitacionError, data: habitacionData } = await supabase
-        .from('habitaciones')
-        .update({ estado: 'ocupada' })
-        .eq('id', reserva.habitacion_id)
-        .select();
+      // NO cambiar el estado de la habitación aquí
+      // La habitación se marcará como ocupada automáticamente cuando sea el día del check-in
+      console.log('✅ Habitación permanece disponible hasta el día del check-in');
 
-      if (habitacionError) {
-        console.error(' Error al actualizar habitación:', habitacionError);
-        throw habitacionError;
-      }
-      console.log('✅ Habitación actualizada:', habitacionData);
-
-      alert(`Pago de $${reserva.total} procesado exitosamente vía ${metodoPago}. Habitación cambiada a OCUPADA.`);
+      alert(`Pago de $${reserva.total} procesado exitosamente vía ${metodoPago}. La habitación se marcará como OCUPADA el día del check-in.`);
       onSuccess();
     } catch (error) {
       console.error(' Error al procesar pago:', error);

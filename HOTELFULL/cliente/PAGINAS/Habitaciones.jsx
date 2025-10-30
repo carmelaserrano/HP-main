@@ -181,6 +181,35 @@ function Habitaciones() {
               ? habitacion.imagenes
               : roomConfig.images;
 
+
+              // ------------------------------------------------
+              // AGREGAR AMENIDADES DINÁMICAS SEGÚN BASE DE DATOS
+              // -------------------------------------------------
+            // Construir features dinámicamente basándose en los valores de la base de datos
+            const dynamicFeatures = [];
+
+            // Agregar tipo de cama si existe
+            if (habitacion.tipo_cama) {
+              dynamicFeatures.push({ icon: 'fa-bed', text: habitacion.tipo_cama });
+            }
+
+            // Agregar amenidades solo si están en TRUE
+            if (habitacion.tv_smart) {
+              dynamicFeatures.push({ icon: 'fa-tv', text: t('habitaciones.smartTv') });
+            }
+            if (habitacion.aire_acondicionado) {
+              dynamicFeatures.push({ icon: 'fa-wind', text: t('habitaciones.airConditioning') });
+            }
+            if (habitacion.bano_completo) {
+              dynamicFeatures.push({ icon: 'fa-bath', text: t('habitaciones.bath') });
+            }
+            if (habitacion.wifi) {
+              dynamicFeatures.push({ icon: 'fa-wifi', text: t('habitaciones.highSpeedWifi') });
+            }
+
+            // Si no hay features dinámicas, usar las del mapeo como fallback
+            const featuresToShow = dynamicFeatures.length > 0 ? dynamicFeatures : roomConfig.features;
+
             return (
               <RoomCard
                 key={habitacion.id}
@@ -188,10 +217,10 @@ function Habitaciones() {
                 title={habitacion.tipo}
                 description={habitacion.descripcion}
                 badge={roomConfig.badge}
-                features={roomConfig.features}
+                features={featuresToShow}
                 details={{
                   guests: `${habitacion.capacidad} ${t('habitaciones.guests')}`,
-                  size: '60 m²'
+                  size: habitacion.metros_cuadrados ? `${habitacion.metros_cuadrados} m²` : '60 m²'
                 }}
                 price={`$${habitacion.precio_por_noche}`}
                 period={t('habitaciones.perNight')}
