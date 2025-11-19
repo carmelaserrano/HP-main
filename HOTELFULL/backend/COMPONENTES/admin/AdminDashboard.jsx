@@ -438,6 +438,7 @@ const [editingServicio, setEditingServicio] = useState(null);
                 <thead>
                   <tr>
                     <th>Nombre</th>
+                    <th>Email</th>
                     <th>Teléfono</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -447,12 +448,17 @@ const [editingServicio, setEditingServicio] = useState(null);
                   {operadores.map(op => (
                     <tr key={op.id}>
                       <td><strong>{op.nombre}</strong></td>
+                      <td>{op.email || 'N/A'}</td>
                       <td>{op.telefono || 'N/A'}</td>
+                      
+
+                      {/* estado */}
                       <td>
                         <span className={`badge ${op.activo ? 'badge-confirmada' : 'badge-cancelada'}`}>
                           {op.activo ? 'Activo' : 'Deshabilitado'}
                         </span>
                       </td>
+                      {/* acciones */}
                       <td>
                         <button
                           className="btn-action"
@@ -1059,13 +1065,63 @@ function ModalOperador({ onClose, onSuccess, operador }) {
     e.preventDefault();
     setLoading(true);
 
+
+    // VALIDACIONES
+
     try {
+        if (!formData.nombre || formData.nombre.trim().length === 0) {
+        alert('El nombre es obligatorio');
+        setLoading(false);
+        return;
+      }
+
+      // Validar que el nombre solo contenga letras y espacios
+      const nombre = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+      if (!nombre.test(formData.nombre)) {
+        alert('El nombre solo puede contener letras y espacios');
+        setLoading(false);
+        return;
+      }
+
+      // Validar email
+      if (!formData.email || formData.email.trim().length === 0) {
+        alert('El email es obligatorio');
+        setLoading(false);
+        return;
+      }
+
+      // Debe comenzar con uno o más caracteres que NO sean espacios ni @
+//Debe tener exactamente un @
+//  Después del @ debe haber caracteres que no sean espacios ni @
+//  Debe tener un punto (el \ escapa el punto)
+//  Debe terminar con caracteres que no sean espacios ni @
+      const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email.test(formData.email)) {
+        alert('Por favor ingresa un email válido');
+        setLoading(false);
+        return;
+      }
+
+      // Validar teléfono (opcional pero si se ingresa debe ser válido)
+      if (formData.telefono && formData.telefono.trim().length > 0) {
+        const telefono = /^[\d\-]+$/;
+        if (!telefono.test(formData.telefono)) {
+          alert('El teléfono solo puede contener números y guiones');
+          setLoading(false);
+          return;
+        }
+
+      }
+
+      // ------------------------------------------------------------------------------------------
+
       if (operador) {
 
 
         // Editar operador existente
         const updateData = {
           nombre: formData.nombre,
+          email: formData.email,
           telefono: formData.telefono
         };
 

@@ -10,19 +10,60 @@ function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [hasSession, setHasSession] = useState(null); // null = verificando, true = tiene sesión, false = no tiene
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   useEffect(() => {
     // Verificar si el usuario llegó desde el link del correo
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        setError(t('resetpwd.text1'));
+      console.log('🔍 Verificando sesión para reset password...');
+
+      // Primero revisar el hash de la URL (token de recuperación)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type');
+
+      console.log('🔑 Token de acceso encontrado:', accessToken ? 'SÍ' : 'NO');
+      console.log('📝 Tipo de evento:', type);
+
+      // Si hay tokens en la URL pero no hay sesión, establecerla
+      if (accessToken && type === 'recovery') {
+        console.log('✅ Detectado link de recuperación válido, estableciendo sesión...');
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (error) {
+          console.error('❌ Error al establecer sesión:', error);
+          setError('El link de recuperación es inválido o ha expirado. Redirigiendo al login...');
+          setHasSession(false);
+          setTimeout(() => navigate('/login'), 3000);
+          return;
+        }
+
+        console.log('✅ Sesión establecida correctamente:', data);
+        setHasSession(true);
+      } else {
+        // Verificar sesión existente
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+          console.log('❌ No hay sesión activa');
+          setError('El link de recuperación es inválido o ha expirado. Redirigiendo al login...');
+          setHasSession(false);
+          setTimeout(() => navigate('/login'), 3000);
+        } else {
+          console.log('✅ Sesión activa encontrada');
+          setHasSession(true);
+        }
       }
     };
+
     checkSession();
-  }, []);
+  }, [navigate, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,6 +141,39 @@ function ResetPassword() {
     }
   };
 
+  // Mostrar mensaje de carga mientras verifica la sesión
+  if (hasSession === null) {
+    return (
+      <div className="reset-page">
+        <div className="reset-container">
+          <div className="reset-header">
+            <h1>Verificando link de recuperación...</h1>
+            <div style={{ textAlign: 'center', marginTop: '20px' }}>
+              <span className="spinner"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no hay sesión válida, mostrar error
+  if (hasSession === false) {
+    return (
+      <div className="reset-page">
+        <div className="reset-container">
+          <div className="reset-header">
+            <h1>Link Inválido</h1>
+            <div className="error-message" style={{ marginTop: '20px' }}>
+              <span>⚠</span> {error}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Formulario normal si hay sesión válida
   return (
     <div className="reset-page">
       <div className="reset-container">
